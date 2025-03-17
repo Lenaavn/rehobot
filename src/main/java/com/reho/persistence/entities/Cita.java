@@ -2,12 +2,9 @@ package com.reho.persistence.entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reho.persistence.entities.enums.Estado;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +36,9 @@ public class Cita {
 
 	@Column(name = "id_servicio")
 	private int idServicio;
+	
+	@Column(name = "id_pago")
+	private int idPago;
 
 	@Column(columnDefinition = "DATE")
 	private LocalDate fecha;
@@ -55,10 +55,10 @@ public class Cita {
 	private Vehiculo vehiculo;
 
 	@ManyToOne
-	@JoinColumn(name = "id_seervicio", referencedColumnName = "id", insertable = false, updatable = false)
+	@JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
 	private Servicio servicio;
 
-	@OneToMany(mappedBy = "cita", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JsonIgnore
-	private List<Pago> pagos;
+	@OneToOne
+	@JoinColumn(name = "id_pago", referencedColumnName = "id", insertable = false, updatable = false)
+	private Pago pago;
 }

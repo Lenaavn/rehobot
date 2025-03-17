@@ -1,44 +1,40 @@
 package com.reho.persistence.entities;
 
-import com.reho.persistence.entities.enums.MetodoPago;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "pago")
+@Table(name = "servicita")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Pago {
-
+public class ServiCita {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
+	
+	@Column(name = "id_servicio")
+	private int idServicio;
+	
 	@Column(name = "id_cita")
 	private int idCita;
+	
+	@ManyToOne
+    @JoinColumn(name = "id_cita", referencedColumnName = "id", insertable = false, updatable = false)
+    private Cita cita;
 
-	@Column(columnDefinition = "DECIMAL(5,2)")
-	private Double monto;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "metodo_pago", length = 20, nullable = false)
-	private MetodoPago metodoPago;
-
-	@OneToOne
-	@JoinColumn(name = "id_cita", referencedColumnName = "id", insertable = false, updatable = false)
-	private Cita cita;
+    @ManyToOne
+    @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
+    private Servicio servicio;
 
 }
