@@ -1,6 +1,6 @@
 package com.reho.service.dto;
 
-import java.util.List;
+import com.reho.persistence.entities.enums.Nombre;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,8 @@ public class ServiCitaDTO {
 	private Integer id;
     private Integer idServicio;
     private Integer idCita;
-    private String nombre; 
-    private Double precio;
-    private List<CitaDTO> citas;
+    private Nombre servicioNombre; 
+    private Double servicioPrecio;
+    private String servicioDescripcion;
 
 }

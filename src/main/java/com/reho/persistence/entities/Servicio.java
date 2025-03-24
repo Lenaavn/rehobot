@@ -3,10 +3,13 @@ package com.reho.persistence.entities;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.reho.persistence.entities.enums.Nombre;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,8 +30,9 @@ public class Servicio {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(length = 50, nullable = false)
-	private String nombre;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "nombre", length = 50, nullable = false)
+	private Nombre nombre;
 
 	@Column(length = 100)
 	private String descripcion;

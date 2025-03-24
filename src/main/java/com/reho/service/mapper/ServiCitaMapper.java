@@ -1,44 +1,42 @@
 package com.reho.service.mapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.reho.persistence.entities.ServiCita;
+import com.reho.persistence.entities.Servicio;
+import com.reho.persistence.repository.ServicioRepository;
+import com.reho.service.dto.ServiCitaDTO;
 
 @Component
 public class ServiCitaMapper {
 
-	/*
-	public ServiCitaDTO toDTO(ServiCita serviCita){
-		ServiCitaDTO dto = new ServiCitaDTO();
+    @Autowired
+    private ServicioRepository servicioRepository;
 
-        dto.setId(desayuno.getId());
-        dto.setNombre(desayuno.getNombre());
-        dto.setPrecio(desayuno.getPrecio());
-        dto.setImagen(desayuno.getImagen());
-        dto.setPuntuacion(desayuno.getPuntuacion());
-        dto.setEstablecimiento(desayuno.getEstablecimiento().getNombre());
+    public ServiCitaDTO toDTO(ServiCita serviCita) {
+        ServiCitaDTO dto = new ServiCitaDTO();
 
-        List<ReviewDTO>reviews = new ArrayList<ReviewDTO>();
-
-        for (Review review : desayuno.getReviews()) {
-            ReviewDTO reviewDTO = new ReviewDTO();
-            // Asumiendo que tienes un método toDTO en Review o configuras ReviewDTO manualmente
-            reviewDTO.setId(review.getId());
-            reviewDTO.setFecha(review.getFecha());
-            reviewDTO.setPuntuacion(review.getPuntuacion());
-            // Agrega más campos si es necesario
-            reviews.add(reviewDTO);
-        }
-
-        dto.setReviews(reviews);
-
+        dto.setId(serviCita.getId());
+        dto.setIdCita(serviCita.getIdCita());
+        dto.setIdServicio(serviCita.getIdServicio());
+        dto.setServicioNombre(serviCita.getServicio().getNombre());
+        dto.setServicioPrecio(serviCita.getServicio().getPrecio());
+        dto.setServicioDescripcion(serviCita.getServicio().getDescripcion());
+       
         return dto;
     }
-    
-    public Desayuno toEntity(DesayunoDTO dto) {
-    	Desayuno desayuno = new Desayuno();
-    	
-    	
-    	
-    	return desayuno;
+
+    public ServiCita toEntity(ServiCitaDTO dto) {
+        ServiCita serviCita = new ServiCita();
+
+        serviCita.setId(dto.getId());
+        serviCita.setIdCita(dto.getIdCita());
+        serviCita.setIdServicio(dto.getIdServicio());
+
+        Servicio servicio = servicioRepository.findById(dto.getIdServicio()).get();
+        serviCita.setServicio(servicio);
+
+        return serviCita;
     }
-*/
 }

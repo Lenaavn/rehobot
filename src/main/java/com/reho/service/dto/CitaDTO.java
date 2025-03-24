@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.reho.persistence.entities.enums.Estado;
+import com.reho.persistence.entities.enums.Nombre;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class CitaDTO {
 	private int idVehiculo;
 	private String vehiculo;
 	private int idServicio;
-	private String servicio;
+	private Nombre servicio;
 	private String nombreUsuario;
 	private int idPago;
 	private LocalDate fecha;

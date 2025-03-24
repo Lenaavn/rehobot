@@ -36,6 +36,7 @@ public class CitaMapper {
         dto.setIdPago(cita.getIdPago());
         dto.setFecha(cita.getFecha());
         dto.setHora(cita.getHora());
+        dto.setEstado(cita.getEstado());
 
         return dto;
     }
@@ -49,6 +50,7 @@ public class CitaMapper {
         cita.setIdPago(dto.getIdPago());
         cita.setFecha(dto.getFecha());
         cita.setHora(dto.getHora());
+        cita.setEstado(cita.getEstado());
         
         Vehiculo vehiculo = vehiculoRepository.findById(dto.getIdVehiculo()).get();
         cita.setVehiculo(vehiculo);
