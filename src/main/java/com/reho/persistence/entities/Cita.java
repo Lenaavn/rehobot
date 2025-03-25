@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import com.reho.persistence.entities.enums.Estado;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,38 +28,39 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Cita {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Column(name = "id_vehiculo")
-	private int idVehiculo;
+    @Column(name = "id_vehiculo", nullable = false)
+    private int idVehiculo;
 
-	@Column(name = "id_servicio")
-	private int idServicio;
-	
-	@Column(name = "id_pago")
-	private int idPago;
+    @Column(name = "id_servicio", nullable = false)
+    private int idServicio;
 
-	@Column(columnDefinition = "DATE")
-	private LocalDate fecha;
+    @Column(name = "id_pago", nullable = true)
+    private int idPago;
 
-	@Column(columnDefinition = "TIME")
-	private LocalTime hora;
+    @Column(columnDefinition = "DATE", nullable = false)
+    private LocalDate fecha;
 
-	@Enumerated(EnumType.STRING)
-	@Column(length = 20)
-	private Estado estado;
+    @Column(columnDefinition = "TIME", nullable = false)
+    private LocalTime hora;
 
-	@ManyToOne
-	@JoinColumn(name = "id_vehiculo", referencedColumnName = "id", insertable = false, updatable = false)
-	private Vehiculo vehiculo;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Estado estado;
 
-	@ManyToOne
-	@JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
-	private Servicio servicio;
+    @ManyToOne
+    @JoinColumn(name = "id_vehiculo", referencedColumnName = "id", insertable = false, updatable = false)
+    private Vehiculo vehiculo;
 
-	@OneToOne
-	@JoinColumn(name = "id_pago", referencedColumnName = "id", insertable = false, updatable = false)
-	private Pago pago;
+    @ManyToOne
+    @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
+    private Servicio servicio;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_pago", referencedColumnName = "id", insertable = false, updatable = false)
+    private Pago pago;
 }
+

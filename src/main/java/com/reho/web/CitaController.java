@@ -1,6 +1,7 @@
 package com.reho.web;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,58 +16,62 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.reho.persistence.entities.Cita;
 import com.reho.service.CitaService;
+import com.reho.service.dto.CitaDTO;
+import com.reho.service.mapper.CitaMapper;
 
 @RestController
 @RequestMapping("/citas")
 public class CitaController {
 
-	
 	@Autowired
 	private CitaService citaService;
-	
+
+	@Autowired
+	private CitaMapper citaMapper;
+
 	@GetMapping
-	public ResponseEntity<List<Cita>> list(){
-		return ResponseEntity.ok(this.citaService.findAll());
+	public ResponseEntity<List<CitaDTO>> list() {
+		List<CitaDTO> citaDTOs = this.citaService.findAll().stream().map(citaMapper::toDTO).collect(Collectors.toList());
+		
+		return ResponseEntity.ok(citaDTOs);
 	}
-	
+
 	@GetMapping("/{idCita}")
-	public ResponseEntity<Cita> findById(@PathVariable int idCita) {
-		if(this.citaService.existsCita(idCita)) {
-			return ResponseEntity.ok(this.citaService.findById(idCita).get());
+	public ResponseEntity<CitaDTO> findById(@PathVariable int idCita) {
+		if (this.citaService.existsCita(idCita)) {
+			return ResponseEntity.ok(citaMapper.toDTO(this.citaService.findById(idCita).get()));
 		}
-		
 		return ResponseEntity.notFound().build();
-		
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Cita> create(@RequestBody Cita cita){
-		return ResponseEntity.ok(this.citaService.create(cita));
+	public ResponseEntity<CitaDTO> create(@RequestBody CitaDTO citaDTO) {
+		Cita cita = citaMapper.toEntity(citaDTO);
+		Cita createdCita = this.citaService.create(cita);
+		return ResponseEntity.ok(citaMapper.toDTO(createdCita));
 	}
-	
+
 	@PutMapping("/{idCita}")
-	public ResponseEntity<Cita> update(@PathVariable int idCita, @RequestBody Cita cita){
-		if(this.citaService.existsCita(idCita)) {
-			return ResponseEntity.ok(this.citaService.save(cita));
+	public ResponseEntity<CitaDTO> update(@PathVariable int idCita, @RequestBody CitaDTO citaDTO) {
+		if (this.citaService.existsCita(idCita)) {
+			if (idCita != citaDTO.getId()) {
+				return ResponseEntity.badRequest().build();
+			}
+
+			Cita cita = citaMapper.toEntity(citaDTO);
+			Cita updatedCita = this.citaService.save(cita);
+
+			return ResponseEntity.ok(citaMapper.toDTO(updatedCita));
 		}
-		
-		if(idCita != cita.getId()) {
-			return ResponseEntity.badRequest().build();
-		}
-		
+
 		return ResponseEntity.notFound().build();
-		
 	}
-	
+
 	@DeleteMapping("/{idCita}")
-	public ResponseEntity<Cita> delete(@PathVariable int idCita){
-		if(this.citaService.delete(idCita)) {
+	public ResponseEntity<Void> delete(@PathVariable int idCita) {
+		if (this.citaService.delete(idCita)) {
 			return ResponseEntity.ok().build();
 		}
-
 		return ResponseEntity.notFound().build();
-	}	
-	
-
-	
+	}
 }

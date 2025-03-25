@@ -19,53 +19,51 @@ import com.reho.service.UsuarioService;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-	
+
 	@Autowired
 	private UsuarioService usuarioService;
-	
+
 	@GetMapping
-	public ResponseEntity<List<Usuario>> list(){
+	public ResponseEntity<List<Usuario>> list() {
 		return ResponseEntity.ok(this.usuarioService.findAll());
 	}
-	
+
 	@GetMapping("/{idUsuario}")
 	public ResponseEntity<Usuario> findById(@PathVariable int idUsuario) {
-		if(this.usuarioService.existsUsuario(idUsuario)) {
+		if (this.usuarioService.existsUsuario(idUsuario)) {
 			return ResponseEntity.ok(this.usuarioService.findById(idUsuario).get());
 		}
-		
+
 		return ResponseEntity.notFound().build();
-		
+
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Usuario> create(@RequestBody Usuario usuario){
+	public ResponseEntity<Usuario> create(@RequestBody Usuario usuario) {
 		return ResponseEntity.ok(this.usuarioService.create(usuario));
 	}
-	
+
 	@PutMapping("/{idUsuario}")
-	public ResponseEntity<Usuario> update(@PathVariable int idUsuario, @RequestBody Usuario usuario){
-		if(this.usuarioService.existsUsuario(idUsuario)) {
+	public ResponseEntity<Usuario> update(@PathVariable int idUsuario, @RequestBody Usuario usuario) {
+		if (this.usuarioService.existsUsuario(idUsuario)) {
 			return ResponseEntity.ok(this.usuarioService.save(usuario));
 		}
-		
-		if(idUsuario != usuario.getId()) {
+
+		if (idUsuario != usuario.getId()) {
 			return ResponseEntity.badRequest().build();
 		}
-		
+
 		return ResponseEntity.notFound().build();
-		
+
 	}
-	
+
 	@DeleteMapping("/{idUsuario}")
-	public ResponseEntity<Usuario> delete(@PathVariable int idUsuario){
-		if(this.usuarioService.delete(idUsuario)) {
+	public ResponseEntity<Usuario> delete(@PathVariable int idUsuario) {
+		if (this.usuarioService.delete(idUsuario)) {
 			return ResponseEntity.ok().build();
 		}
 
 		return ResponseEntity.notFound().build();
-	}	
-	
+	}
 
-	
 }

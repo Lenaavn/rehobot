@@ -26,21 +26,23 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Servicio {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "nombre", length = 50, nullable = false)
-	private Nombre nombre;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nombre", length = 50, nullable = false)
+    private Nombre nombre;
 
-	@Column(length = 100)
-	private String descripcion;
+    @Column(length = 100)
+    private String descripcion;
 
-	@Column(columnDefinition = "DECIMAL(5,2)")
-	private Double precio;
+    @Column(columnDefinition = "DECIMAL(5,2)", nullable = false)
+    private Double precio;
 
-	@OneToMany(mappedBy = "vehiculo", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JsonIgnore
-	private List<Cita> citas;
+    @OneToMany(mappedBy = "servicio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Cita> citas;
 }
+
+

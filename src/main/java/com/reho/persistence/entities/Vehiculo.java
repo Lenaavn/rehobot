@@ -25,28 +25,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Vehiculo {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Column(name = "id_usuario")
-	private int idUsuario;
+    @Column(name = "id_usuario", nullable = false)
+    private int idUsuario;
 
-	@Column(length = 50, nullable = false)
-	private String marca;
+    @Column(length = 50, nullable = false)
+    private String marca;
 
-	@Column(length = 50, nullable = false)
-	private String modelo;
+    @Column(length = 50, nullable = false)
+    private String modelo;
 
-	@Column(length = 7, nullable = false, unique = true)
-	private String matricula;
+    @Column(length = 7, nullable = false, unique = true)
+    private String matricula;
 
-	@ManyToOne
-	@JoinColumn(name = "id_usuario", referencedColumnName = "id", insertable = false, updatable = false)
-	private Usuario usuario;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id", insertable = false, updatable = false)
+    private Usuario usuario;
 
-	@OneToMany(mappedBy = "vehiculo", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JsonIgnore
-	private List<Cita> citas;
-
+    @OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Cita> citas;
 }
+

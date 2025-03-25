@@ -18,23 +18,23 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ServiCita {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	
-	@Column(name = "id_servicio")
-	private int idServicio;
-	
-	@Column(name = "id_cita")
-	private int idCita;
-	
-	@ManyToOne
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "id_servicio", nullable = false)
+    private int idServicio;
+
+    @Column(name = "id_cita", nullable = false)
+    private int idCita;
+
+    @ManyToOne
     @JoinColumn(name = "id_cita", referencedColumnName = "id", insertable = false, updatable = false)
     private Cita cita;
 
     @ManyToOne
     @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
     private Servicio servicio;
-
 }
+

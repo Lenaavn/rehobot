@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.reho.persistence.entities.Cita;
+import com.reho.persistence.entities.enums.Estado;
 import com.reho.persistence.repository.CitaRepository;
 
 @Service
@@ -28,6 +29,7 @@ public class CitaService {
 	}
 	
 	public Cita create(Cita cita) {
+		cita.setEstado(Estado.NO_PAGADA);
 		return this.citaRepository.save(cita);
 	}
 	
