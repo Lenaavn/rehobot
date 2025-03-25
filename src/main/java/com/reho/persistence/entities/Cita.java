@@ -38,7 +38,7 @@ public class Cita {
     @Column(name = "id_servicio", nullable = false)
     private int idServicio;
 
-    @Column(name = "id_pago", nullable = true)
+    @Column(name = "id_pago", nullable = false)
     private int idPago;
 
     @Column(columnDefinition = "DATE", nullable = false)

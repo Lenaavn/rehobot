@@ -13,7 +13,7 @@ import com.reho.persistence.repository.PagoRepository;
 public class PagoService {
 	
 	@Autowired
-	private PagoRepository  pagoRepository;
+	private PagoRepository pagoRepository;
 	
 	public List<Pago> findAll(){
 		return this.pagoRepository.findAll();
