@@ -1,0 +1,54 @@
+package com.reho.web;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.reho.persistence.entities.Servicio;
+import com.reho.service.ServicioService;
+
+@RestController
+@RequestMapping("/servicios")
+public class ServicioController {
+    
+    @Autowired
+    private ServicioService servicioService;
+    
+    @GetMapping
+    public ResponseEntity<List<Servicio>> list() {
+        return ResponseEntity.ok(this.servicioService.findAll());
+    }
+    
+    @GetMapping("/{idServicio}")
+    public ResponseEntity<Servicio> findById(@PathVariable int idServicio) {
+        Optional<Servicio> servicio = this.servicioService.findById(idServicio);
+        return servicio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
+    @PostMapping
+    public ResponseEntity<Servicio> create(@RequestBody Servicio servicio) {
+        return ResponseEntity.ok(this.servicioService.create(servicio));
+    }
+    
+    @PutMapping("/{idServicio}")
+    public ResponseEntity<Servicio> update(@PathVariable int idServicio, @RequestBody Servicio servicio) {
+        if (idServicio != servicio.getId()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!this.servicioService.existServicio(idServicio)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(this.servicioService.save(servicio));
+    }
+    
+    @DeleteMapping("/{idServicio}")
+    public ResponseEntity<Void> delete(@PathVariable int idServicio) {
+        if (this.servicioService.delete(idServicio)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
