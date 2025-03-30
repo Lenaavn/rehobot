@@ -6,15 +6,19 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.reho.persistence.entities.Usuario;
 import com.reho.persistence.entities.Vehiculo;
+import com.reho.persistence.repository.UsuarioRepository;
 import com.reho.persistence.repository.VehiculoRepository;
 
 @Service
 public class VehiculoService {
 
-	
 	@Autowired
 	private VehiculoRepository vehiculoRepository;
+	
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 	
 	public List<Vehiculo> findAll(){
 		return this.vehiculoRepository.findAll();
@@ -29,7 +33,13 @@ public class VehiculoService {
 	}
 	
 	public Vehiculo create(Vehiculo vehiculo) {
-		return this.vehiculoRepository.save(vehiculo);
+		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
+	            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
+
+	    vehiculo.setUsuario(usuario);
+
+	    // Guardar el vehículo
+	    return vehiculoRepository.save(vehiculo);
 	}
 	
 	public Vehiculo save(Vehiculo vehiculo) {

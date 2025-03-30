@@ -1,5 +1,6 @@
 package com.reho.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reho.persistence.entities.enums.MetodoPago;
 
 import jakarta.persistence.Column;
@@ -23,22 +24,24 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Pago {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    
+    @Column(name = "id_cita", insertable = false, updatable = false)
+    private int idCita;
 
-	@Column(name = "id_cita")
-	private int idCita;
+    @Column(columnDefinition = "DECIMAL(5,2)")
+    private Double monto;
 
-	@Column(columnDefinition = "DECIMAL(5,2)")
-	private Double monto;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "metodo_pago", length = 20, nullable = false)
+    private MetodoPago metodoPago;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "metodo_pago", length = 20, nullable = false)
-	private MetodoPago metodoPago;
-
-	@OneToOne
-	@JoinColumn(name = "id_cita", referencedColumnName = "id", insertable = false, updatable = false)
-	private Cita cita;
+    @OneToOne
+    @JoinColumn(name = "id_cita", referencedColumnName = "id", nullable = false)
+    @JsonIgnore
+    private Cita cita;
 
 }
+

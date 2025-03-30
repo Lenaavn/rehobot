@@ -27,23 +27,12 @@ public class PagoService {
 		return this.pagoRepository.findById(idPago);
 	}
 	
-	public Pago create(Pago pago) {
-		return this.pagoRepository.save(pago);
-	}
-	
 	public Pago save(Pago pago) {
-		return this.pagoRepository.save(pago);
+	    if (pago.getCita() == null) {
+	        throw new IllegalArgumentException("El Pago debe estar asociado a una Cita");
+	    }
+	    return this.pagoRepository.save(pago);
 	}
-	
-	public boolean delete(int idPago) {
-		boolean result = false;
-		
-		if(this.pagoRepository.existsById(idPago)) {
-			this.pagoRepository.deleteById(idPago);
-			result = true;
-		}
-		
-		return result;
-	}
+
 
 }

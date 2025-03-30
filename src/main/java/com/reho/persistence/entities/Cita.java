@@ -38,7 +38,7 @@ public class Cita {
     @Column(name = "id_servicio", nullable = false)
     private int idServicio;
 
-    @Column(name = "id_pago", nullable = false)
+    @Column(name = "id_pago", nullable = false) // Campo para mantener el id del pago relacionado
     private int idPago;
 
     @Column(columnDefinition = "DATE", nullable = false)
@@ -59,8 +59,9 @@ public class Cita {
     @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
     private Servicio servicio;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_pago", referencedColumnName = "id", insertable = false, updatable = false)
+    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL, orphanRemoval = true)
     private Pago pago;
+ 
 }
+
 

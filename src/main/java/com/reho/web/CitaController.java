@@ -46,29 +46,42 @@ public class CitaController {
 
 	@PostMapping
 	public ResponseEntity<CitaDTO> create(@RequestBody CitaDTO citaDTO) {
-		Cita cita = citaMapper.toEntity(citaDTO);
-		Cita createdCita = this.citaService.create(cita);
-		return ResponseEntity.ok(citaMapper.toDTO(createdCita));
+	    // Convierte el DTO a entidad
+	    Cita cita = citaMapper.toEntity(citaDTO);
+
+	    // Usa el servicio para crear la cita y el pago asociado
+	    Cita createdCita = this.citaService.create(cita);
+
+	    // Convierte la entidad creada de vuelta a DTO
+	    CitaDTO responseDTO = citaMapper.toDTO(createdCita);
+
+	    // Devuelve la respuesta con el DTO convertido
+	    return ResponseEntity.ok(responseDTO);
 	}
 
 	@PutMapping("/{idCita}")
 	public ResponseEntity<CitaDTO> update(@PathVariable int idCita, @RequestBody CitaDTO citaDTO) {
-		if (this.citaService.existsCita(idCita)) {
-			if (idCita != citaDTO.getId()) {
-				return ResponseEntity.badRequest().build();
-			}
+	    if (citaService.existsCita(idCita)) {
+	        if (idCita != citaDTO.getId()) {
+	            return ResponseEntity.badRequest().build();
+	        }
 
-			Cita cita = citaMapper.toEntity(citaDTO);
-			Cita updatedCita = this.citaService.save(cita);
+	        // Convertir el DTO a entidad
+	        Cita cita = citaMapper.toEntity(citaDTO);
 
-			return ResponseEntity.ok(citaMapper.toDTO(updatedCita));
-		}
+	        // Guardar la cita actualizada
+	        Cita updatedCita = citaService.save(cita);
 
-		return ResponseEntity.notFound().build();
+	        // Convertir la entidad actualizada a DTO para la respuesta
+	        return ResponseEntity.ok(citaMapper.toDTO(updatedCita));
+	    }
+	    return ResponseEntity.notFound().build();
 	}
 
+
+
 	@DeleteMapping("/{idCita}")
-	public ResponseEntity<Void> delete(@PathVariable int idCita) {
+	public ResponseEntity<Cita> delete(@PathVariable int idCita) {
 		if (this.citaService.delete(idCita)) {
 			return ResponseEntity.ok().build();
 		}

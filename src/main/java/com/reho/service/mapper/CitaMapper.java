@@ -24,22 +24,22 @@ public class CitaMapper {
 	@Autowired
 	private PagoRepository pagoRepository;
 	
-	public CitaDTO toDTO(Cita cita){
-		CitaDTO dto = new CitaDTO();
+	public CitaDTO toDTO(Cita cita) {
+	    CitaDTO dto = new CitaDTO();
+	    dto.setId(cita.getId());
+	    dto.setIdVehiculo(cita.getIdVehiculo());
+	    dto.setVehiculo(cita.getVehiculo() != null ? cita.getVehiculo().getMatricula() : null);
+	    dto.setNombreUsuario(cita.getVehiculo() != null && cita.getVehiculo().getUsuario() != null ? cita.getVehiculo().getUsuario().getNombre() : null);
+	    dto.setIdServicio(cita.getIdServicio());
+	    dto.setServicio(cita.getServicio() != null ? cita.getServicio().getNombre() : null);
+	    dto.setIdPago(cita.getPago() != null ? cita.getPago().getId() : 0);
+	    dto.setFecha(cita.getFecha());
+	    dto.setHora(cita.getHora());
+	    dto.setEstado(cita.getEstado());
+	    
+	    return dto;
+	}
 
-        dto.setId(cita.getId());
-        dto.setIdVehiculo(cita.getIdVehiculo());
-        dto.setVehiculo(cita.getVehiculo().getMatricula());
-        dto.setNombreUsuario(cita.getVehiculo().getUsuario().getNombre());
-        dto.setIdServicio(cita.getIdServicio());
-        dto.setServicio(cita.getServicio().getNombre());
-        dto.setIdPago(cita.getIdPago());
-        dto.setFecha(cita.getFecha());
-        dto.setHora(cita.getHora());
-        dto.setEstado(cita.getEstado());
-
-        return dto;
-    }
     
     public Cita toEntity(CitaDTO dto) {
     	Cita cita = new Cita();
@@ -58,8 +58,12 @@ public class CitaMapper {
         Servicio servicio = servicioRepository.findById(dto.getIdServicio()).get();
         cita.setServicio(servicio);
 
-        Pago pago = pagoRepository.findById(dto.getIdPago()).get();
-        cita.setPago(pago);
+     // Mantener la relación con el pago existente
+        if (dto.getIdPago() != 0) {
+            Pago pagoExistente = pagoRepository.findById(dto.getIdPago())
+                    .orElseThrow(() -> new IllegalArgumentException("Pago no encontrado con ID: " + dto.getIdPago()));
+            cita.setPago(pagoExistente); // Mantener el pago actual
+        }
     	
     	return cita;
     }
