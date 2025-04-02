@@ -1,5 +1,6 @@
 package com.reho.persistence.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,6 +48,6 @@ public class Vehiculo {
 
     @OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Cita> citas;
+    private List<Cita> citas = new ArrayList<>();;
 }
 

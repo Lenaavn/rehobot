@@ -41,6 +41,7 @@ public class CitaController {
 		if (this.citaService.existsCita(idCita)) {
 			return ResponseEntity.ok(citaMapper.toDTO(this.citaService.findById(idCita).get()));
 		}
+		
 		return ResponseEntity.notFound().build();
 	}
 

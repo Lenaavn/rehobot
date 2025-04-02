@@ -1,15 +1,20 @@
 package com.reho.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.reho.persistence.entities.Cita;
 import com.reho.persistence.entities.Usuario;
 import com.reho.persistence.entities.Vehiculo;
+import com.reho.persistence.repository.CitaRepository;
 import com.reho.persistence.repository.UsuarioRepository;
 import com.reho.persistence.repository.VehiculoRepository;
+import com.reho.service.dto.VehiculoDTO;
+import com.reho.service.mapper.VehiculoMapper;
 
 @Service
 public class VehiculoService {
@@ -19,6 +24,12 @@ public class VehiculoService {
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private CitaRepository citaRepository;
+	
+	@Autowired
+	private VehiculoMapper vehiculoMapper;
 	
 	public List<Vehiculo> findAll(){
 		return this.vehiculoRepository.findAll();
@@ -32,19 +43,57 @@ public class VehiculoService {
 		return this.vehiculoRepository.findById(idVehiculo);
 	}
 	
-	public Vehiculo create(Vehiculo vehiculo) {
-		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
+	public VehiculoDTO create(Vehiculo vehiculo) {
+	    // Validar que el usuario existe
+	    Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
 	            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
 
 	    vehiculo.setUsuario(usuario);
 
-	    // Guardar el vehículo
-	    return vehiculoRepository.save(vehiculo);
+	    // Garantizar que la lista de citas no sea null
+	    if (vehiculo.getCitas() == null) {
+	        vehiculo.setCitas(new ArrayList<>());
+	    }
+
+	    Vehiculo savedVehiculo = vehiculoRepository.save(vehiculo);
+	    return vehiculoMapper.toDTO(savedVehiculo);
 	}
-	
-	public Vehiculo save(Vehiculo vehiculo) {
-		return this.vehiculoRepository.save(vehiculo);
+
+	public VehiculoDTO save(Vehiculo vehiculo) {
+	    // Validar que el vehículo existe
+	    Vehiculo existingVehiculo = vehiculoRepository.findById(vehiculo.getId())
+	            .orElseThrow(() -> new IllegalArgumentException("El vehículo con ID " + vehiculo.getId() + " no existe."));
+
+	    // Validar que el usuario existe
+	    Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
+	            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
+
+	    // Asociar el usuario al vehículo
+	    existingVehiculo.setUsuario(usuario);
+
+	    // Actualizar propiedades del vehículo
+	    existingVehiculo.setMarca(vehiculo.getMarca());
+	    existingVehiculo.setModelo(vehiculo.getModelo());
+	    existingVehiculo.setMatricula(vehiculo.getMatricula());
+
+	    // Actualizar citas asociadas
+	    if (vehiculo.getCitas() != null && !vehiculo.getCitas().isEmpty()) {
+	        for (Cita nuevaCita : vehiculo.getCitas()) {
+	            if (nuevaCita.getId() != null) {
+	                // Actualizar citas existentes
+	                Cita citaExistente = citaRepository.findById(nuevaCita.getId())
+	                        .orElseThrow(() -> new IllegalArgumentException("La cita con ID " + nuevaCita.getId() + " no existe."));
+	                citaExistente.setVehiculo(existingVehiculo); // Asegurar asociación
+	            }
+	        }
+	    }
+
+	    // Guardar el vehículo actualizado
+	    Vehiculo updatedVehiculo = vehiculoRepository.save(existingVehiculo);
+	    return vehiculoMapper.toDTO(updatedVehiculo);
 	}
+
+
 	
 	public boolean delete(int idVehiculo) {
 		boolean result = false;

@@ -1,6 +1,7 @@
 package com.reho.web;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,55 +16,65 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.reho.persistence.entities.Vehiculo;
 import com.reho.service.VehiculoService;
+import com.reho.service.dto.VehiculoDTO;
+import com.reho.service.mapper.VehiculoMapper;
 
 
 @RestController
 @RequestMapping("/vehiculos")
 public class VehiculoController {
-	
-	@Autowired
-	private VehiculoService vehiculoService;
-	
-	@GetMapping
-	public ResponseEntity<List<Vehiculo>> list(){
-		return ResponseEntity.ok(this.vehiculoService.findAll());
-	}
-	
-	@GetMapping("/{idVehiculo}")
-	public ResponseEntity<Vehiculo> findById(@PathVariable int idVehiculo) {
-		if(this.vehiculoService.existsVehiculo(idVehiculo)) {
-			return ResponseEntity.ok(this.vehiculoService.findById(idVehiculo).get());
-		}
-		
-		return ResponseEntity.notFound().build();
-		
-	}
-	
-	@PostMapping
-	public ResponseEntity<Vehiculo> create(@RequestBody Vehiculo vehiculo){
-		return ResponseEntity.ok(this.vehiculoService.create(vehiculo));
-	}
-	
-	@PutMapping("/{idVehiculo}")
-	public ResponseEntity<Vehiculo> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo){
-		if(this.vehiculoService.existsVehiculo(idVehiculo)) {
-			return ResponseEntity.ok(this.vehiculoService.save(vehiculo));
-		}
-		
-		if(idVehiculo != vehiculo.getId()) {
-			return ResponseEntity.badRequest().build();
-		}
-		
-		return ResponseEntity.notFound().build();
-		
-	}
-	
-	@DeleteMapping("/{idVehiculo}")
-	public ResponseEntity<Vehiculo> delete(@PathVariable int idVehiculo){
-		if(this.vehiculoService.delete(idVehiculo)) {
-			return ResponseEntity.ok().build();
-		}
+    
+    @Autowired
+    private VehiculoService vehiculoService;
+    
+    @Autowired
+	private VehiculoMapper vehiculoMapper;
+    
+    @GetMapping
+    public ResponseEntity<List<VehiculoDTO>> list() {
+        List<VehiculoDTO> vehiculos = this.vehiculoService.findAll().stream().map(vehiculoMapper::toDTO).collect(Collectors.toList());;
+       
+        return ResponseEntity.ok(vehiculos);
+    }
+    
+    @GetMapping("/{idVehiculo}")
+    public ResponseEntity<VehiculoDTO> findById(@PathVariable int idVehiculo) {
+        if (this.vehiculoService.existsVehiculo(idVehiculo)) {
+        	return ResponseEntity.ok(vehiculoMapper.toDTO(this.vehiculoService.findById(idVehiculo).get()));
+        }
+        
+        return ResponseEntity.notFound().build();
+    }
+    
+    @PostMapping
+    public ResponseEntity<VehiculoDTO> create(@RequestBody VehiculoDTO vehiculoDTO) {
+        // Llamar al servicio para crear el vehículo
+        VehiculoDTO savedVehiculo = this.vehiculoService.create(vehiculoMapper.toEntity(vehiculoDTO));
+        return ResponseEntity.ok(savedVehiculo); 
+    }
 
-		return ResponseEntity.notFound().build();
-	}	
+    
+    @PutMapping("/{idVehiculo}")
+    public ResponseEntity<VehiculoDTO> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo) {
+        if (!vehiculoService.existsVehiculo(idVehiculo)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (idVehiculo != vehiculo.getId()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        VehiculoDTO updatedVehiculo = vehiculoService.save(vehiculo);
+        return ResponseEntity.ok(updatedVehiculo);
+    }
+    
+    @DeleteMapping("/{idVehiculo}")
+    public ResponseEntity<Vehiculo> delete(@PathVariable int idVehiculo) {
+        if (this.vehiculoService.delete(idVehiculo)) {
+            return ResponseEntity.ok().build();
+        }
+        
+        return ResponseEntity.notFound().build();
+    }
 }
+
