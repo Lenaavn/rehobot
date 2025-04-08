@@ -48,6 +48,6 @@ public class Vehiculo {
 
     @OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Cita> citas = new ArrayList<>();;
+    private List<Cita> citas = new ArrayList<>();
 }
 

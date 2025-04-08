@@ -34,9 +34,10 @@ public class ServicioController {
     }
     
     @PutMapping("/{idServicio}")
-    public ResponseEntity<Servicio> update(@PathVariable int idServicio, @RequestBody Servicio servicio) {
+    // ResponseEntity<?> para permitir diferentes tipos de respuesta
+    public ResponseEntity<?> update(@PathVariable int idServicio, @RequestBody Servicio servicio) {
         if (idServicio != servicio.getId()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del servicio.");
         }
         if (!this.servicioService.existServicio(idServicio)) {
             return ResponseEntity.notFound().build();

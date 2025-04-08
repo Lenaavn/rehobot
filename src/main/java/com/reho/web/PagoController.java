@@ -37,24 +37,22 @@ public class PagoController {
 	}
 	
 	@PutMapping("/{idPago}")
-	public ResponseEntity<Pago> update(@PathVariable int idPago, @RequestBody Pago pago) {
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> update(@PathVariable int idPago, @RequestBody Pago pago) {
 	    if (!this.pagoService.existPago(idPago)) {
 	        return ResponseEntity.notFound().build();
 	    }
 
-	    // Asegúrate de que el ID en el cuerpo coincide con el ID en la URL
 	    if (idPago != pago.getId()) {
-	        return ResponseEntity.badRequest().build();
+	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del pago.");
 	    }
 
-	    // Obtener el pago existente para mantener la asociación con la cita
 	    Pago pagoExistente = this.pagoService.findById(idPago).orElseThrow(() -> 
 	            new IllegalArgumentException("Pago no encontrado con ID: " + idPago));
 
 	    // Mantener la asociación con la cita existente
 	    pago.setCita(pagoExistente.getCita());
 
-	    // Guardar el pago actualizado
 	    return ResponseEntity.ok(this.pagoService.save(pago));
 	}	
 	

@@ -46,18 +46,20 @@ public class UsuarioController {
 	}
 
 	@PutMapping("/{idUsuario}")
-	public ResponseEntity<Usuario> update(@PathVariable int idUsuario, @RequestBody Usuario usuario) {
-		if (this.usuarioService.existsUsuario(idUsuario)) {
-			return ResponseEntity.ok(this.usuarioService.save(usuario));
-		}
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> update(@PathVariable int idUsuario, @RequestBody Usuario usuario) {
+	    if (idUsuario != (usuario.getId())) {
+	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del usuario.");
+	    }
 
-		if (idUsuario != usuario.getId()) {
-			return ResponseEntity.badRequest().build();
-		}
+	    if (!this.usuarioService.existsUsuario(idUsuario)) {
+	        return ResponseEntity.notFound().build();
+	    }
 
-		return ResponseEntity.notFound().build();
-
+	    return ResponseEntity.ok(this.usuarioService.save(usuario));
 	}
+
+
 
 	@DeleteMapping("/{idUsuario}")
 	public ResponseEntity<Usuario> delete(@PathVariable int idUsuario) {

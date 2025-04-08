@@ -2,7 +2,8 @@ package com.reho.persistence.entities;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.reho.persistence.entities.enums.Rol;
 
 import jakarta.persistence.CascadeType;
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Usuario {
 
     @Id
@@ -47,7 +49,7 @@ public class Usuario {
     private String telefono;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonIgnoreProperties("usuario")
     private List<Vehiculo> vehiculos;
 }
 

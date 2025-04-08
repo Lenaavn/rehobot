@@ -22,7 +22,7 @@ public class ServiCitaController {
         return ResponseEntity.ok(this.serviCitaService.findAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idServiCita}")
     public ResponseEntity<ServiCita> findById(@PathVariable int id) {
         Optional<ServiCita> serviCita = this.serviCitaService.findById(id);
         return serviCita.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -33,10 +33,11 @@ public class ServiCitaController {
         return ResponseEntity.ok(this.serviCitaService.create(serviCita));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ServiCita> update(@PathVariable int id, @RequestBody ServiCita serviCita) {
+    @PutMapping("/{idServiCita}")
+    // ResponseEntity<?> para permitir diferentes tipos de respuesta
+    public ResponseEntity<?> update(@PathVariable int id, @RequestBody ServiCita serviCita) {
         if (id != serviCita.getId()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del serviCita.");
         }
         if (!this.serviCitaService.existServiCita(id)) {
             return ResponseEntity.notFound().build();
@@ -44,7 +45,7 @@ public class ServiCitaController {
         return ResponseEntity.ok(this.serviCitaService.save(serviCita));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idServiCita}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         if (this.serviCitaService.delete(id)) {
             return ResponseEntity.ok().build();

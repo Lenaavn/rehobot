@@ -55,13 +55,14 @@ public class VehiculoController {
 
     
     @PutMapping("/{idVehiculo}")
-    public ResponseEntity<VehiculoDTO> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo) {
+    // ResponseEntity<?> para permitir diferentes tipos de respuesta
+    public ResponseEntity<?> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo) {
         if (!vehiculoService.existsVehiculo(idVehiculo)) {
             return ResponseEntity.notFound().build();
         }
 
         if (idVehiculo != vehiculo.getId()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del vehiculo.");
         }
 
         VehiculoDTO updatedVehiculo = vehiculoService.save(vehiculo);

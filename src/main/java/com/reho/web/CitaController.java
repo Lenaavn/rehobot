@@ -61,10 +61,11 @@ public class CitaController {
 	}
 
 	@PutMapping("/{idCita}")
-	public ResponseEntity<CitaDTO> update(@PathVariable int idCita, @RequestBody CitaDTO citaDTO) {
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> update(@PathVariable int idCita, @RequestBody CitaDTO citaDTO) {
 	    if (citaService.existsCita(idCita)) {
 	        if (idCita != citaDTO.getId()) {
-	            return ResponseEntity.badRequest().build();
+	            return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del cita.");
 	        }
 
 	        // Convertir el DTO a entidad
