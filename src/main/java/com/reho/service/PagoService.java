@@ -28,10 +28,23 @@ public class PagoService {
 	}
 	
 	public Pago save(Pago pago) {
+		
+		Pago existingPago = pagoRepository.findById(pago.getId()).get();
+		
 	    if (pago.getCita() == null) {
 	        throw new IllegalArgumentException("El Pago debe estar asociado a una Cita");
 	    }
-	    return this.pagoRepository.save(pago);
+	    
+	    if (pago.getMonto() != null) {
+	        existingPago.setMonto(pago.getMonto());
+	    }
+	    if (pago.getMetodoPago() != null) {
+	        existingPago.setMetodoPago(pago.getMetodoPago());
+	    }
+	    
+	    existingPago.setCita(pago.getCita());
+	    
+	    return this.pagoRepository.save(existingPago);
 	}
 
 

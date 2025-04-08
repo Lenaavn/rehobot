@@ -37,24 +37,28 @@ public class PagoController {
 	}
 	
 	@PutMapping("/{idPago}")
-	// ResponseEntity<?> para permitir diferentes tipos de respuesta
 	public ResponseEntity<?> update(@PathVariable int idPago, @RequestBody Pago pago) {
 	    if (!this.pagoService.existPago(idPago)) {
 	        return ResponseEntity.notFound().build();
 	    }
 
-	    if (idPago != pago.getId()) {
+	    if (pago.getId() == null || idPago != pago.getId()) {
 	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del pago.");
 	    }
+	    
+	    if (pago.getMetodoPago() == null) {
+	        return ResponseEntity.badRequest().body("El campo 'metodoPago' no puede ser nulo.");
+	    }
 
-	    Pago pagoExistente = this.pagoService.findById(idPago).orElseThrow(() -> 
-	            new IllegalArgumentException("Pago no encontrado con ID: " + idPago));
+	    // Obtener el Pago existente para mantener datos anteriores no enviados
+	    Pago pagoExistente = this.pagoService.findById(idPago).get();
 
 	    // Mantener la asociación con la cita existente
 	    pago.setCita(pagoExistente.getCita());
 
 	    return ResponseEntity.ok(this.pagoService.save(pago));
-	}	
+	}
+
 	
 	// metodo activar - desactivar pago que esta en pizzapedido
 

@@ -33,8 +33,27 @@ public class UsuarioService {
 	}
 	
 	public Usuario save(Usuario usuario) {
-		return this.usuarioRepository.save(usuario);
-	}
+		
+        Usuario existingUsuario = usuarioRepository.findById(usuario.getId()).get();
+
+        if (usuario.getNombre() != null && !usuario.getNombre().trim().isEmpty()) {
+            existingUsuario.setNombre(usuario.getNombre());
+        }
+        if (usuario.getEmail() != null && !usuario.getEmail().trim().isEmpty()) {
+            existingUsuario.setEmail(usuario.getEmail());
+        }
+        if (usuario.getContrasena() != null && !usuario.getContrasena().trim().isEmpty()) {
+            existingUsuario.setContrasena(usuario.getContrasena());
+        }
+        if (usuario.getRol() != null) {
+            existingUsuario.setRol(usuario.getRol());
+        }
+        if (usuario.getTelefono() != null && !usuario.getTelefono().trim().isEmpty()) {
+            existingUsuario.setTelefono(usuario.getTelefono());
+        }
+
+        return usuarioRepository.save(existingUsuario);
+    }
 	
 	public boolean delete(int idUsuario) {
 		boolean result = false;
