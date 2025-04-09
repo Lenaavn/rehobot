@@ -35,13 +35,13 @@ public class Cita {
     private Integer id;
 
     @Column(name = "id_vehiculo", nullable = false)
-    private int idVehiculo;
+    private Integer idVehiculo;
 
     @Column(name = "id_servicio", nullable = false)
-    private int idServicio;
+    private Integer idServicio;
 
-    @Column(name = "id_pago", nullable = false) // Campo para mantener el id del pago relacionado
-    private int idPago;
+    @Column(name = "id_pago", nullable = false) 
+    private Integer idPago;
 
     @Column(columnDefinition = "DATE", nullable = false)
     private LocalDate fecha;

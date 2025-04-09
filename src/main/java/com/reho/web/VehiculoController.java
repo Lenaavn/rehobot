@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.reho.persistence.entities.Vehiculo;
+import com.reho.service.UsuarioService;
 import com.reho.service.VehiculoService;
 import com.reho.service.dto.VehiculoDTO;
 import com.reho.service.mapper.VehiculoMapper;
@@ -28,6 +29,9 @@ public class VehiculoController {
 
 	@Autowired
 	private VehiculoMapper vehiculoMapper;
+	
+	@Autowired
+	private UsuarioService usuarioService;
 
 	@GetMapping
 	public ResponseEntity<List<VehiculoDTO>> list() {
@@ -51,21 +55,33 @@ public class VehiculoController {
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta
 	public ResponseEntity<?> create(@RequestBody VehiculoDTO vehiculoDTO) {
 
-		vehiculoDTO.setMatricula(vehiculoDTO.getMatricula().toUpperCase());
+	    if (vehiculoDTO.getIdUsuario() == null) {
+	        return ResponseEntity.badRequest().body("El campo 'idUsuario' no puede ser nulo.");
+	    }
 
-		String matriculaValida = vehiculoService.validateMatricula(vehiculoDTO.getMatricula());
+	    if (!usuarioService.existsUsuario(vehiculoDTO.getIdUsuario())) {
+	        return ResponseEntity.badRequest().body("El usuario especificado no existe.");
+	    }
 
-		if (matriculaValida == null) {
-			return ResponseEntity.badRequest().body("La matrícula no tiene un formato válido.");
-		}
+	    // Convertir la matrícula a mayúsculas
+	    vehiculoDTO.setMatricula(vehiculoDTO.getMatricula().toUpperCase());
 
-		if (vehiculoService.existsByMatricula(vehiculoDTO.getMatricula())) {
-			return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
-		}
+	    // Validar que la matrícula sea válida
+	    String matriculaValida = vehiculoService.validateMatricula(vehiculoDTO.getMatricula());
+	    if (matriculaValida == null) {
+	        return ResponseEntity.badRequest().body("La matrícula no tiene un formato válido.");
+	    }
 
-		VehiculoDTO savedVehiculo = this.vehiculoService.create(vehiculoMapper.toEntity(vehiculoDTO));
-		return ResponseEntity.ok(savedVehiculo);
+	    // Validar si ya existe un vehículo con la misma matrícula
+	    if (vehiculoService.existsByMatricula(vehiculoDTO.getMatricula())) {
+	        return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
+	    }
+
+	    // Crear el vehículo
+	    VehiculoDTO savedVehiculo = this.vehiculoService.create(vehiculoMapper.toEntity(vehiculoDTO));
+	    return ResponseEntity.ok(savedVehiculo);
 	}
+
 
 	@PutMapping("/{idVehiculo}")
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta
@@ -84,6 +100,10 @@ public class VehiculoController {
 			return ResponseEntity.badRequest().body("No se permite cambiar el 'idUsuario' del vehículo.");
 		}
 
+		if (!usuarioService.existsUsuario(vehiculo.getIdUsuario())) {
+	        return ResponseEntity.badRequest().body("El usuario especificado no existe.");
+	    }
+
 		if (vehiculo.getMarca() == null) {
 			return ResponseEntity.badRequest().body("El campo 'marca' no puede ser nulo.");
 		}
@@ -100,9 +120,13 @@ public class VehiculoController {
 			return ResponseEntity.badRequest().body("La matricula puede tener como máximo 8 caracteres");
 		}
 
-		if (vehiculoService.existsByMatricula(vehiculo.getMatricula())) {
-			return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
-		}
+		// Verificar si la matrícula ha cambiado
+	    if (!existingVehiculo.getMatricula().equals(vehiculo.getMatricula())) {
+	        // Validar que no exista otro vehículo con la nueva matrícula
+	        if (vehiculoService.existsByMatricula(vehiculo.getMatricula())) {
+	            return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
+	        }
+	    }
 
 		vehiculo.setMatricula(vehiculo.getMatricula().toUpperCase());
 

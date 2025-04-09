@@ -41,7 +41,33 @@ public class UsuarioController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Usuario> create(@RequestBody Usuario usuario) {
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> create(@RequestBody Usuario usuario) {
+		
+		if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
+	    	return ResponseEntity.badRequest().body("El atributo 'nombre' no puede estar vacío ni ser nulo para crear el usuario.");
+	    }
+	    
+	    if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+	    	return ResponseEntity.badRequest().body("El atributo 'email' no puede estar vacío ni ser nulo para crear el usuario.");
+	    }
+	    
+	    if (usuario.getContrasena() == null || usuario.getContrasena().trim().isEmpty()) {
+	    	return ResponseEntity.badRequest().body("El atributo 'contrasena' no puede estar vacío ni ser nulo para crear el usuario.");
+	    }
+	    
+	    if (usuario.getTelefono() == null || usuario.getTelefono().trim().isEmpty()) {
+	    	return ResponseEntity.badRequest().body("El atributo 'telefono' no puede estar vacío ni ser nulo para crear el usuario.");
+	    }
+	    
+	    if (usuarioService.existsByEmail(usuario.getEmail())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo email.");
+	    }
+
+	    if (usuarioService.existsByTelefono(usuario.getTelefono())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo teléfono.");
+	    }
+		
 		return ResponseEntity.ok(this.usuarioService.create(usuario));
 	}
 

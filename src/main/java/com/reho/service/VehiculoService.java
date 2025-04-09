@@ -45,8 +45,7 @@ public class VehiculoService {
 
 	public VehiculoDTO create(Vehiculo vehiculo) {
 		// Validar que el usuario existe
-		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).orElseThrow(
-				() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
+		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).get();
 
 		vehiculo.setUsuario(usuario);
 
@@ -61,13 +60,11 @@ public class VehiculoService {
 
 	public VehiculoDTO save(Vehiculo vehiculo) {
 		// Validar que el vehículo existe
-		Vehiculo existingVehiculo = vehiculoRepository.findById(vehiculo.getId()).orElseThrow(
-				() -> new IllegalArgumentException("El vehículo con ID " + vehiculo.getId() + " no existe."));
+		Vehiculo existingVehiculo = vehiculoRepository.findById(vehiculo.getId()).get();
 
 		// Validar que el usuario existe
-		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).orElseThrow(
-				() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
-
+		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).get();
+		
 		// Asociar el usuario al vehículo
 		existingVehiculo.setUsuario(usuario);
 

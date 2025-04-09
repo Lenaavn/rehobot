@@ -62,7 +62,7 @@ public class CitaMapper {
         if (dto.getIdPago() != 0) {
             Pago pagoExistente = pagoRepository.findById(dto.getIdPago())
                     .orElseThrow(() -> new IllegalArgumentException("Pago no encontrado con ID: " + dto.getIdPago()));
-            cita.setPago(pagoExistente); // Mantener el pago actual
+            cita.setPago(pagoExistente); 
         }
     	
     	return cita;

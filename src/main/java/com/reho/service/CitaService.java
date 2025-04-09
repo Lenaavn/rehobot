@@ -11,12 +11,16 @@ import com.reho.persistence.entities.Pago;
 import com.reho.persistence.entities.enums.Estado;
 import com.reho.persistence.entities.enums.MetodoPago;
 import com.reho.persistence.repository.CitaRepository;
+import com.reho.persistence.repository.PagoRepository;
 
 @Service
 public class CitaService {
 
 	@Autowired
 	private CitaRepository citaRepository;
+	
+	@Autowired
+	private PagoRepository pagoRepository;
 
 	public List<Cita> findAll() {
 		return this.citaRepository.findAll();
@@ -31,22 +35,24 @@ public class CitaService {
 	}
 
 	public Cita create(Cita cita) {
-		// Configurar el estado inicial de la cita
-		if (cita.getEstado() == null) {
-			cita.setEstado(Estado.NO_PAGADA);
-		}
+	    // Configurar el estado inicial de la cita
+	    if (cita.getEstado() == null) {
+	        cita.setEstado(Estado.NO_PAGADA);
+	    }
 
-		// Crear el pago asociado automáticamente
-		Pago pago = new Pago();
-		pago.setMonto(0.0); // Monto inicial
-		pago.setMetodoPago(MetodoPago.SIN_DETERMINAR); // Método de pago predeterminado
-		pago.setCita(cita); // Asociar el pago con la cita
+	    // Crear el pago asociado automáticamente
+	    Pago pago = new Pago();
+	    pago.setMonto(0.0); // Definir valores predeterminados
+	    pago.setMetodoPago(MetodoPago.SIN_DETERMINAR); // Definir método de pago predeterminado
+	    pago = pagoRepository.save(pago); // Persistir el pago en la base de datos
 
-		cita.setPago(pago); // Asociar la cita con el pago
+	    // Asociar el pago a la cita
+	    cita.setPago(pago);
 
-		// Guardar ambos en la base de datos
-		return citaRepository.save(cita); // CascadeType.ALL guardará el pago automáticamente
+	    // Guardar la cita con el pago asignado
+	    return citaRepository.save(cita);
 	}
+
 
 	public Cita save(Cita cita) {
 		// Si el estado es nulo, asignar un valor predeterminado
