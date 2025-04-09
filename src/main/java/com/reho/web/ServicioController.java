@@ -39,9 +39,19 @@ public class ServicioController {
         if (idServicio != servicio.getId()) {
             return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del servicio.");
         }
+        
+        if (servicio.getNombre() == null) {
+        	return ResponseEntity.badRequest().body("El campo 'nombre' no puede ser nulo.");
+        }
+        
+        if (servicio.getPrecio() == null) {
+	        return ResponseEntity.badRequest().body("El campo 'precio' no puede ser nulo.");
+	    }
+        
         if (!this.servicioService.existServicio(idServicio)) {
             return ResponseEntity.notFound().build();
         }
+        
         return ResponseEntity.ok(this.servicioService.save(servicio));
     }
     

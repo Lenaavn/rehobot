@@ -51,22 +51,25 @@ public class UsuarioController {
 	    if (idUsuario != (usuario.getId())) {
 	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del usuario.");
 	    }
-
-	    if (!this.usuarioService.existsUsuario(idUsuario)) {
-	        return ResponseEntity.notFound().build();
-	    }
 	    
 	    if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
 	    	return ResponseEntity.badRequest().body("El atributo 'nombre' no puede estar vacío ni ser nulo para actualizar el usuario.");
 	    }
+	    
 	    if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
 	    	return ResponseEntity.badRequest().body("El atributo 'email' no puede estar vacío ni ser nulo para actualizar el usuario.");
 	    }
+	    
 	    if (usuario.getContrasena() == null || usuario.getContrasena().trim().isEmpty()) {
 	    	return ResponseEntity.badRequest().body("El atributo 'contrasena' no puede estar vacío ni ser nulo para actualizar el usuario.");
 	    }
+	    
 	    if (usuario.getRol() == null) {
 	    	return ResponseEntity.badRequest().body("El atributo 'rol' no puede estar nulo para actualizar el usuario.");
+	    }
+	    
+	    if (!this.usuarioService.existsUsuario(idUsuario)) {
+	        return ResponseEntity.notFound().build();
 	    }
 
 	    return ResponseEntity.ok(this.usuarioService.save(usuario));

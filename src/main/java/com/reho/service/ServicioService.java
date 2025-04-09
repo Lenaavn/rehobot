@@ -28,7 +28,22 @@ public class ServicioService {
     }
     
     public Servicio save(Servicio servicio) {
-        return servicioRepository.save(servicio);
+    	
+    	Servicio existingServicio = servicioRepository.findById(servicio.getId()).get();
+    	
+    	if (servicio.getNombre() != null) {
+    		existingServicio.setNombre(servicio.getNombre());
+    	}
+    	
+    	if (servicio.getDescripcion() != null) {
+    		existingServicio.setDescripcion(servicio.getDescripcion());
+    	}
+    	
+    	if (servicio.getPrecio() != null) {
+    		existingServicio.setPrecio(servicio.getPrecio());
+    	}
+    	
+    	return this.servicioRepository.save(existingServicio);
     }
     
     public boolean delete(int id) {

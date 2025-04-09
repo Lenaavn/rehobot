@@ -19,63 +19,113 @@ import com.reho.service.VehiculoService;
 import com.reho.service.dto.VehiculoDTO;
 import com.reho.service.mapper.VehiculoMapper;
 
-
 @RestController
 @RequestMapping("/vehiculos")
 public class VehiculoController {
-    
-    @Autowired
-    private VehiculoService vehiculoService;
-    
-    @Autowired
+
+	@Autowired
+	private VehiculoService vehiculoService;
+
+	@Autowired
 	private VehiculoMapper vehiculoMapper;
-    
-    @GetMapping
-    public ResponseEntity<List<VehiculoDTO>> list() {
-        List<VehiculoDTO> vehiculos = this.vehiculoService.findAll().stream().map(vehiculoMapper::toDTO).collect(Collectors.toList());;
-       
-        return ResponseEntity.ok(vehiculos);
-    }
-    
-    @GetMapping("/{idVehiculo}")
-    public ResponseEntity<VehiculoDTO> findById(@PathVariable int idVehiculo) {
-        if (this.vehiculoService.existsVehiculo(idVehiculo)) {
-        	return ResponseEntity.ok(vehiculoMapper.toDTO(this.vehiculoService.findById(idVehiculo).get()));
-        }
-        
-        return ResponseEntity.notFound().build();
-    }
-    
-    @PostMapping
-    public ResponseEntity<VehiculoDTO> create(@RequestBody VehiculoDTO vehiculoDTO) {
-        // Llamar al servicio para crear el vehículo
-        VehiculoDTO savedVehiculo = this.vehiculoService.create(vehiculoMapper.toEntity(vehiculoDTO));
-        return ResponseEntity.ok(savedVehiculo); 
-    }
 
-    
-    @PutMapping("/{idVehiculo}")
-    // ResponseEntity<?> para permitir diferentes tipos de respuesta
-    public ResponseEntity<?> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo) {
-        if (!vehiculoService.existsVehiculo(idVehiculo)) {
-            return ResponseEntity.notFound().build();
-        }
+	@GetMapping
+	public ResponseEntity<List<VehiculoDTO>> list() {
+		List<VehiculoDTO> vehiculos = this.vehiculoService.findAll().stream().map(vehiculoMapper::toDTO)
+				.collect(Collectors.toList());
+		;
 
-        if (idVehiculo != vehiculo.getId()) {
-            return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del vehiculo.");
-        }
+		return ResponseEntity.ok(vehiculos);
+	}
 
-        VehiculoDTO updatedVehiculo = vehiculoService.save(vehiculo);
-        return ResponseEntity.ok(updatedVehiculo);
-    }
-    
-    @DeleteMapping("/{idVehiculo}")
-    public ResponseEntity<Vehiculo> delete(@PathVariable int idVehiculo) {
-        if (this.vehiculoService.delete(idVehiculo)) {
-            return ResponseEntity.ok().build();
-        }
-        
-        return ResponseEntity.notFound().build();
-    }
+	@GetMapping("/{idVehiculo}")
+	public ResponseEntity<VehiculoDTO> findById(@PathVariable int idVehiculo) {
+		if (this.vehiculoService.existsVehiculo(idVehiculo)) {
+			return ResponseEntity.ok(vehiculoMapper.toDTO(this.vehiculoService.findById(idVehiculo).get()));
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	@PostMapping
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> create(@RequestBody VehiculoDTO vehiculoDTO) {
+
+		vehiculoDTO.setMatricula(vehiculoDTO.getMatricula().toUpperCase());
+
+		String matriculaValida = vehiculoService.validateMatricula(vehiculoDTO.getMatricula());
+
+		if (matriculaValida == null) {
+			return ResponseEntity.badRequest().body("La matrícula no tiene un formato válido.");
+		}
+
+		if (vehiculoService.existsByMatricula(vehiculoDTO.getMatricula())) {
+			return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
+		}
+
+		VehiculoDTO savedVehiculo = this.vehiculoService.create(vehiculoMapper.toEntity(vehiculoDTO));
+		return ResponseEntity.ok(savedVehiculo);
+	}
+
+	@PutMapping("/{idVehiculo}")
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> update(@PathVariable int idVehiculo, @RequestBody Vehiculo vehiculo) {
+		if (vehiculo.getId() == null || idVehiculo != vehiculo.getId()) {
+			return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del vehiculo.");
+		}
+
+		if (vehiculo.getIdUsuario() == null) {
+			return ResponseEntity.badRequest().body("El campo 'idUsuario' no puede ser nulo.");
+		}
+
+		Vehiculo existingVehiculo = vehiculoService.findById(vehiculo.getId()).get();
+
+		if (!vehiculo.getIdUsuario().equals(existingVehiculo.getIdUsuario())) {
+			return ResponseEntity.badRequest().body("No se permite cambiar el 'idUsuario' del vehículo.");
+		}
+
+		if (vehiculo.getMarca() == null) {
+			return ResponseEntity.badRequest().body("El campo 'marca' no puede ser nulo.");
+		}
+
+		if (vehiculo.getModelo() == null) {
+			return ResponseEntity.badRequest().body("El campo 'modelo' no puede ser nulo.");
+		}
+
+		if (vehiculo.getMatricula() == null) {
+			return ResponseEntity.badRequest().body("El campo 'matricula' no puede ser nulo.");
+		}
+
+		if (vehiculo.getMatricula().length() > 8) {
+			return ResponseEntity.badRequest().body("La matricula puede tener como máximo 8 caracteres");
+		}
+
+		if (vehiculoService.existsByMatricula(vehiculo.getMatricula())) {
+			return ResponseEntity.badRequest().body("Ya existe un vehículo con la misma matrícula.");
+		}
+
+		vehiculo.setMatricula(vehiculo.getMatricula().toUpperCase());
+
+		String matriculaValida = vehiculoService.validateMatricula(vehiculo.getMatricula());
+		if (matriculaValida == null) {
+			return ResponseEntity.badRequest().body("La matrícula no tiene un formato válido.");
+		}
+
+		if (!vehiculoService.existsVehiculo(idVehiculo)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		VehiculoDTO updatedVehiculo = vehiculoService.save(vehiculo);
+
+		return ResponseEntity.ok(updatedVehiculo);
+	}
+
+	@DeleteMapping("/{idVehiculo}")
+	public ResponseEntity<Vehiculo> delete(@PathVariable int idVehiculo) {
+		if (this.vehiculoService.delete(idVehiculo)) {
+			return ResponseEntity.ok().build();
+		}
+
+		return ResponseEntity.notFound().build();
+	}
 }
-

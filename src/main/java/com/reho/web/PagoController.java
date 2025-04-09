@@ -38,16 +38,20 @@ public class PagoController {
 	
 	@PutMapping("/{idPago}")
 	public ResponseEntity<?> update(@PathVariable int idPago, @RequestBody Pago pago) {
-	    if (!this.pagoService.existPago(idPago)) {
-	        return ResponseEntity.notFound().build();
-	    }
-
-	    if (pago.getId() == null || idPago != pago.getId()) {
+		if (pago.getId() == null || idPago != pago.getId()) {
 	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del pago.");
+	    }
+	    
+	    if (pago.getIdCita() == null) {
+	        return ResponseEntity.badRequest().body("El campo 'idCita' no puede ser nulo.");
 	    }
 	    
 	    if (pago.getMetodoPago() == null) {
 	        return ResponseEntity.badRequest().body("El campo 'metodoPago' no puede ser nulo.");
+	    }
+	    
+		if (!this.pagoService.existPago(idPago)) {
+	        return ResponseEntity.notFound().build();
 	    }
 
 	    // Obtener el Pago existente para mantener datos anteriores no enviados

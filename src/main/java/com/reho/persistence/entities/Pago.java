@@ -1,6 +1,7 @@
 package com.reho.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.reho.persistence.entities.enums.MetodoPago;
 
 import jakarta.persistence.Column;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Pago {
 
     @Id
@@ -29,7 +31,7 @@ public class Pago {
     private Integer id;
     
     @Column(name = "id_cita", insertable = false, updatable = false)
-    private int idCita;
+    private Integer idCita;
 
     @Column(columnDefinition = "DECIMAL(5,2)")
     private Double monto;

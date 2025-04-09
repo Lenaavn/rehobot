@@ -3,6 +3,7 @@ package com.reho.persistence.entities;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.reho.persistence.entities.enums.Estado;
 
 import jakarta.persistence.CascadeType;
@@ -26,6 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Cita {
 
     @Id

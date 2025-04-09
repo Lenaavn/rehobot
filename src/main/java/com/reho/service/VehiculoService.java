@@ -21,89 +21,125 @@ public class VehiculoService {
 
 	@Autowired
 	private VehiculoRepository vehiculoRepository;
-	
+
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
+
 	@Autowired
 	private CitaRepository citaRepository;
-	
+
 	@Autowired
 	private VehiculoMapper vehiculoMapper;
-	
-	public List<Vehiculo> findAll(){
+
+	public List<Vehiculo> findAll() {
 		return this.vehiculoRepository.findAll();
 	}
-	
-	public boolean existsVehiculo(int idVehiculo){
+
+	public boolean existsVehiculo(int idVehiculo) {
 		return this.vehiculoRepository.existsById(idVehiculo);
 	}
-	
-	public Optional<Vehiculo> findById(int idVehiculo){
+
+	public Optional<Vehiculo> findById(int idVehiculo) {
 		return this.vehiculoRepository.findById(idVehiculo);
 	}
-	
+
 	public VehiculoDTO create(Vehiculo vehiculo) {
-	    // Validar que el usuario existe
-	    Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
-	            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
+		// Validar que el usuario existe
+		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).orElseThrow(
+				() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
 
-	    vehiculo.setUsuario(usuario);
+		vehiculo.setUsuario(usuario);
 
-	    // Garantizar que la lista de citas no sea null
-	    if (vehiculo.getCitas() == null) {
-	        vehiculo.setCitas(new ArrayList<>());
-	    }
+		// Garantizar que la lista de citas no sea null
+		if (vehiculo.getCitas() == null) {
+			vehiculo.setCitas(new ArrayList<>());
+		}
 
-	    Vehiculo savedVehiculo = vehiculoRepository.save(vehiculo);
-	    return vehiculoMapper.toDTO(savedVehiculo);
+		Vehiculo savedVehiculo = vehiculoRepository.save(vehiculo);
+		return vehiculoMapper.toDTO(savedVehiculo);
 	}
 
 	public VehiculoDTO save(Vehiculo vehiculo) {
-	    // Validar que el vehículo existe
-	    Vehiculo existingVehiculo = vehiculoRepository.findById(vehiculo.getId())
-	            .orElseThrow(() -> new IllegalArgumentException("El vehículo con ID " + vehiculo.getId() + " no existe."));
+		// Validar que el vehículo existe
+		Vehiculo existingVehiculo = vehiculoRepository.findById(vehiculo.getId()).orElseThrow(
+				() -> new IllegalArgumentException("El vehículo con ID " + vehiculo.getId() + " no existe."));
 
-	    // Validar que el usuario existe
-	    Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario())
-	            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
+		// Validar que el usuario existe
+		Usuario usuario = usuarioRepository.findById(vehiculo.getIdUsuario()).orElseThrow(
+				() -> new IllegalArgumentException("Usuario no encontrado con ID: " + vehiculo.getIdUsuario()));
 
-	    // Asociar el usuario al vehículo
-	    existingVehiculo.setUsuario(usuario);
+		// Asociar el usuario al vehículo
+		existingVehiculo.setUsuario(usuario);
 
-	    // Actualizar propiedades del vehículo
-	    existingVehiculo.setMarca(vehiculo.getMarca());
-	    existingVehiculo.setModelo(vehiculo.getModelo());
-	    existingVehiculo.setMatricula(vehiculo.getMatricula());
+		// Actualizar propiedades del vehículo
+		if (vehiculo.getIdUsuario() != null) {
+			existingVehiculo.setIdUsuario(vehiculo.getIdUsuario());
+		}
 
-	    // Actualizar citas asociadas
-	    if (vehiculo.getCitas() != null && !vehiculo.getCitas().isEmpty()) {
-	        for (Cita nuevaCita : vehiculo.getCitas()) {
-	            if (nuevaCita.getId() != null) {
-	                // Actualizar citas existentes
-	                Cita citaExistente = citaRepository.findById(nuevaCita.getId())
-	                        .orElseThrow(() -> new IllegalArgumentException("La cita con ID " + nuevaCita.getId() + " no existe."));
-	                citaExistente.setVehiculo(existingVehiculo); // Asegurar asociación
-	            }
-	        }
-	    }
+		if (vehiculo.getMarca() != null) {
+			existingVehiculo.setMarca(vehiculo.getMarca());
+		}
 
-	    // Guardar el vehículo actualizado
-	    Vehiculo updatedVehiculo = vehiculoRepository.save(existingVehiculo);
-	    return vehiculoMapper.toDTO(updatedVehiculo);
+		if (vehiculo.getModelo() != null) {
+			existingVehiculo.setModelo(vehiculo.getModelo());
+		}
+
+		if (vehiculo.getMatricula() != null) {
+			existingVehiculo.setMatricula(vehiculo.getMatricula());
+		}
+
+		// Actualizar citas asociadas
+		if (vehiculo.getCitas() != null && !vehiculo.getCitas().isEmpty()) {
+			for (Cita nuevaCita : vehiculo.getCitas()) {
+				if (nuevaCita.getId() != null) {
+					// Actualizar citas existentes
+					Cita citaExistente = citaRepository.findById(nuevaCita.getId()).orElseThrow(
+							() -> new IllegalArgumentException("La cita con ID " + nuevaCita.getId() + " no existe."));
+					citaExistente.setVehiculo(existingVehiculo); // Asegurar asociación
+				}
+			}
+		}
+
+		// Guardar el vehículo actualizado
+		Vehiculo updatedVehiculo = vehiculoRepository.save(existingVehiculo);
+		return vehiculoMapper.toDTO(updatedVehiculo);
 	}
 
-
-	
 	public boolean delete(int idVehiculo) {
 		boolean result = false;
-		
-		if(this.vehiculoRepository.existsById(idVehiculo)) {
+
+		if (this.vehiculoRepository.existsById(idVehiculo)) {
 			this.vehiculoRepository.deleteById(idVehiculo);
 			result = true;
 		}
-		
+
 		return result;
+	}
+
+	public boolean existsByMatricula(String matricula) {
+		return vehiculoRepository.existsByMatricula(matricula);
+	}
+
+	/*
+	 * El método .matches() comprueba si una cadena de texto (String) cumple con un
+	 * patrón específico definido mediante una expresión regular (regex).
+	 */
+
+	public String validateMatricula(String matricula) {
+		if (matricula == null || matricula.isEmpty()) {
+			return null;
+		}
+		
+		matricula = matricula.toUpperCase();
+
+		String patternActual = "^[0-9]{4}[A-Z]{3}$";
+		String patternAntigua = "^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,2}$";
+
+		if (matricula.matches(patternActual) || matricula.matches(patternAntigua)) {
+			return matricula;
+		}
+
+		return null;
 	}
 
 }

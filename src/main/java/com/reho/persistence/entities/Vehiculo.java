@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Vehiculo {
 
     @Id
@@ -31,7 +33,7 @@ public class Vehiculo {
     private Integer id;
 
     @Column(name = "id_usuario", nullable = false)
-    private int idUsuario;
+    private Integer idUsuario;
 
     @Column(length = 50, nullable = false)
     private String marca;
@@ -39,7 +41,7 @@ public class Vehiculo {
     @Column(length = 50, nullable = false)
     private String modelo;
 
-    @Column(length = 7, nullable = false, unique = true)
+    @Column(length = 8, nullable = false, unique = true)
     private String matricula;
 
     @ManyToOne

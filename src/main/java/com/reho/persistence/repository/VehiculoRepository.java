@@ -6,4 +6,6 @@ import com.reho.persistence.entities.Vehiculo;
 
 public interface VehiculoRepository extends JpaRepository<Vehiculo,Integer>{
 
+	boolean existsByMatricula(String matricula);
+	
 }

@@ -35,9 +35,14 @@ public class PagoService {
 	        throw new IllegalArgumentException("El Pago debe estar asociado a una Cita");
 	    }
 	    
+	    if (pago.getIdCita() != null) {
+	        existingPago.setIdCita(pago.getIdCita());
+	    }
+	    
 	    if (pago.getMonto() != null) {
 	        existingPago.setMonto(pago.getMonto());
 	    }
+	    
 	    if (pago.getMetodoPago() != null) {
 	        existingPago.setMetodoPago(pago.getMetodoPago());
 	    }
