@@ -11,6 +11,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,7 +41,7 @@ public class Cita {
     @Column(name = "id_servicio", nullable = false)
     private Integer idServicio;
 
-    @Column(name = "id_pago", nullable = false) 
+    @Column(name = "id_pago", nullable = true) 
     private Integer idPago;
 
     @Column(columnDefinition = "DATE", nullable = false)
@@ -61,7 +62,7 @@ public class Cita {
     @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
     private Servicio servicio;
 
-    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Pago pago;
  
 }

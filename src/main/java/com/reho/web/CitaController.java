@@ -61,7 +61,6 @@ public class CitaController {
 	@PostMapping
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta
 	public ResponseEntity<?> create(@RequestBody CitaDTO citaDTO) {
-		// Validaciones para los campos obligatorios
 		if (!vehiculoService.existsVehiculo(citaDTO.getIdVehiculo())) {
 			return ResponseEntity.badRequest().body("El vehículo especificado no existe.");
 		}
@@ -70,16 +69,14 @@ public class CitaController {
 			return ResponseEntity.badRequest().body("El servicio especificado no existe.");
 		}
 
-		// Convierte el DTO a entidad
 		Cita cita = citaMapper.toEntity(citaDTO);
 
-		// Usa el servicio para crear la cita y el pago asociado
-		Cita createdCita = this.citaService.create(cita);
+		// Usa el servicio para crear la cita con el pago asociado
+		Cita createdCita = citaService.create(cita);
 
 		// Convierte la entidad creada de vuelta a DTO
 		CitaDTO responseDTO = citaMapper.toDTO(createdCita);
 
-		// Devuelve la respuesta con el DTO convertido
 		return ResponseEntity.ok(responseDTO);
 	}
 
@@ -87,13 +84,19 @@ public class CitaController {
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta
 	public ResponseEntity<?> update(@PathVariable int idCita, @RequestBody CitaDTO citaDTO) {
 
-		Cita existingCita = citaRepository.findById(idCita).get();
-
 		if (idCita != citaDTO.getId()) {
 			return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del cita.");
 		}
 
-		if (!existingCita.getIdPago().equals(citaDTO.getIdPago())) {
+		if (!citaService.existsCita(idCita)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Cita existingCita = citaRepository.findById(idCita).get();
+
+		if (citaDTO.getIdPago() == 0) {
+			citaDTO.setIdPago(existingCita.getIdPago());
+		} else if (!existingCita.getIdPago().equals(citaDTO.getIdPago())) {
 			return ResponseEntity.badRequest().body("El campo 'idPago' no se puede actualizar.");
 		}
 
@@ -105,7 +108,6 @@ public class CitaController {
 			return ResponseEntity.badRequest().body("El servicio especificado no existe.");
 		}
 
-		// Validaciones para otros campos obligatorios
 		if (citaDTO.getFecha() == null) {
 			return ResponseEntity.badRequest().body("El campo 'Fecha' no puede ser nulo.");
 		}
@@ -114,13 +116,16 @@ public class CitaController {
 			return ResponseEntity.badRequest().body("El campo 'Hora' no puede ser nulo.");
 		}
 
-		citaDTO.setEstado(citaDTO.getEstado());
+		if (citaDTO.getEstado() == null) {
+			citaDTO.setEstado(existingCita.getEstado());
+		}
 
-		// Convertir el DTO a entidad y actualizar
 		Cita cita = citaMapper.toEntity(citaDTO);
+
+		cita.setIdPago(existingCita.getIdPago());
+
 		Cita updatedCita = citaService.save(cita);
 
-		// Retornar la respuesta con la cita actualizada
 		return ResponseEntity.ok(citaMapper.toDTO(updatedCita));
 	}
 

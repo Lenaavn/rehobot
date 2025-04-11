@@ -18,7 +18,7 @@ public class CitaService {
 
 	@Autowired
 	private CitaRepository citaRepository;
-	
+
 	@Autowired
 	private PagoRepository pagoRepository;
 
@@ -35,34 +35,35 @@ public class CitaService {
 	}
 
 	public Cita create(Cita cita) {
-	    // Configurar el estado inicial de la cita
-	    if (cita.getEstado() == null) {
-	        cita.setEstado(Estado.NO_PAGADA);
-	    }
-
-	    // Crear el pago asociado automáticamente
-	    Pago pago = new Pago();
-	    pago.setMonto(0.0); // Definir valores predeterminados
-	    pago.setMetodoPago(MetodoPago.SIN_DETERMINAR); // Definir método de pago predeterminado
-	    pago = pagoRepository.save(pago); // Persistir el pago en la base de datos
-
-	    // Asociar el pago a la cita
-	    cita.setPago(pago);
-
-	    // Guardar la cita con el pago asignado
-	    return citaRepository.save(cita);
-	}
-
-
-	public Cita save(Cita cita) {
-		// Si el estado es nulo, asignar un valor predeterminado
+		// Establecer estado predeterminado de la cita
 		if (cita.getEstado() == null) {
-			cita.setEstado(Estado.NO_PAGADA); // Valor predeterminado
+			cita.setEstado(Estado.NO_PAGADA);
 		}
 
+		// Guardar la cita inicialmente para obtener su ID
+		Cita citaGuardada = citaRepository.save(cita);
+
+		// Crear el pago y asociarlo a la cita
+		Pago pago = new Pago();
+		pago.setMonto(0.0);
+		pago.setMetodoPago(MetodoPago.SIN_DETERMINAR);
+
+		// Relación bidireccional: asociar la cita al pago
+		pago.setCita(citaGuardada);
+		Pago pagoGuardado = pagoRepository.save(pago);
+
+		// Actualizar la cita con el ID del pago
+		citaGuardada.setPago(pagoGuardado);
+		citaGuardada.setIdPago(pagoGuardado.getId()); // Actualizar idPago manualmente
+
+		// Guardar nuevamente la cita para reflejar los cambios en la base de datos
+		return citaRepository.save(citaGuardada);
+	}
+
+	public Cita save(Cita cita) {
 		// Verificar que el pago esté asociado
 		if (cita.getPago() == null) {
-			throw new IllegalArgumentException("La cita debe tener un pago asociado");
+			throw new IllegalArgumentException("La cita debe tener un pago asociado.");
 		}
 
 		return citaRepository.save(cita);

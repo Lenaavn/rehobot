@@ -24,9 +24,22 @@ public class ServicioController {
 
 	@GetMapping("/{idServicio}")
 	public ResponseEntity<Servicio> findById(@PathVariable int idServicio) {
-		Optional<Servicio> servicio = this.servicioService.findById(idServicio);
-		return servicio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+	    Optional<Servicio> servicioOptional = servicioService.findById(idServicio);
+	    if (servicioOptional.isPresent()) {
+	        Servicio servicio = servicioOptional.get();
+
+	        // Asegurarse de que los pagos estén cargados en las citas
+	        servicio.getCitas().forEach(cita -> {
+	            if (cita.getPago() != null) {
+	                cita.getPago().getId(); // Forzar la carga del pago
+	            }
+	        });
+
+	        return ResponseEntity.ok(servicio);
+	    }
+	    return ResponseEntity.notFound().build();
 	}
+
 
 	@PostMapping
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta

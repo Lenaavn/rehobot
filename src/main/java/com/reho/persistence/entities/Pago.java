@@ -26,24 +26,24 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Pago {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    
-    @Column(name = "id_cita", insertable = false, updatable = false)
-    private Integer idCita;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @Column(columnDefinition = "DECIMAL(5,2)")
-    private Double monto;
+	@Column(name = "id_cita", insertable = false, updatable = false)
+	private Integer idCita;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "metodo_pago", length = 20, nullable = false)
-    private MetodoPago metodoPago;
+	@Column(columnDefinition = "DECIMAL(5,2)")
+	private Double monto;
 
-    @OneToOne
-    @JoinColumn(name = "id_cita", referencedColumnName = "id", nullable = false)
-    @JsonIgnore
-    private Cita cita;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "metodo_pago", length = 20, nullable = false)
+	private MetodoPago metodoPago;
+
+	@OneToOne
+	@JoinColumn(name = "id_cita", referencedColumnName = "id", nullable = false)
+	@JsonIgnore
+	private Cita cita;
 
 }
 
