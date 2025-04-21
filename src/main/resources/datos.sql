@@ -32,6 +32,7 @@ UPDATE cita SET id_pago = 1 WHERE id = 1;
 UPDATE cita SET id_pago = 2 WHERE id = 2;
 
 -- Inserción en la tabla servicita
-INSERT INTO servicita (id_servicio, id_cita) VALUES
-(1, 1),
-(2, 2);
+INSERT INTO servicita (id_servicio, id_cita, comentario, valoracion) VALUES
+(1, 1, 'Excelente servicio, muy rápido.', 3),
+(2, 2, 'Buen trabajo, pero podrían mejorar.', 4.5);
+

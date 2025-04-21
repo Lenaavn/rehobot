@@ -2,44 +2,93 @@ package com.reho.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.reho.persistence.entities.Cita;
 import com.reho.persistence.entities.ServiCita;
+import com.reho.persistence.repository.CitaRepository;
 import com.reho.persistence.repository.ServiCitaRepository;
+import com.reho.service.dto.ServiCitaEntityDTO;
+import com.reho.service.mapper.ServiCitaEntityMapper;
 
 @Service
 public class ServiCitaService {
 
-    @Autowired
-    private ServiCitaRepository serviCitaRepository;
+	@Autowired
+	private ServiCitaRepository serviCitaRepository;
 
-    public List<ServiCita> findAll() {
-        return serviCitaRepository.findAll();
-    }
+	@Autowired
+	private CitaRepository citaRepository;
 
-    public Optional<ServiCita> findById(int id) {
-        return serviCitaRepository.findById(id);
-    }
+	@Autowired
+	private ServiCitaEntityMapper serviCitaEntityMapper;
 
-    public ServiCita create(ServiCita serviCita) {
-        return serviCitaRepository.save(serviCita);
-    }
+	public List<ServiCitaEntityDTO> findAll() {
+		return serviCitaRepository.findAll().stream().map(serviCitaEntityMapper::toDTO).collect(Collectors.toList());
+	}
 
-    public ServiCita save(ServiCita serviCita) {
-        return serviCitaRepository.save(serviCita);
-    }
+	public Optional<ServiCitaEntityDTO> findById(int id) {
+		return serviCitaRepository.findById(id).map(serviCitaEntityMapper::toDTO);
+	}
 
-    public boolean delete(int id) {
-        if (serviCitaRepository.existsById(id)) {
-            serviCitaRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
+	public ServiCitaEntityDTO create(ServiCitaEntityDTO dto) {
+		if (dto.getIdCita() <= 0) {
+			throw new IllegalArgumentException("El 'idCita' no puede ser nulo o negativo.");
+		}
 
-    public boolean existServiCita(int id) {
-        return serviCitaRepository.existsById(id);
-    }
+		Cita cita = citaRepository.findById(dto.getIdCita())
+				.orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con ID: " + dto.getIdCita()));
+
+		dto.setIdServicio(cita.getServicio().getId());
+
+		ServiCita serviCita = serviCitaEntityMapper.toEntity(dto);
+		ServiCita savedServiCita = serviCitaRepository.save(serviCita);
+
+		ServiCita completeServiCita = serviCitaRepository.findById(savedServiCita.getId())
+				.orElseThrow(() -> new IllegalStateException("Error al cargar el ServiCita completo."));
+
+		return serviCitaEntityMapper.toDTO(completeServiCita);
+	}
+
+	public ServiCitaEntityDTO save(ServiCitaEntityDTO dto) {
+		ServiCita existingServiCita = serviCitaRepository.findById(dto.getId())
+				.orElseThrow(() -> new IllegalArgumentException("ServiCita no encontrada con ID: " + dto.getId()));
+
+		if (dto.getIdCita() > 0) {
+			Cita cita = citaRepository.findById(dto.getIdCita())
+					.orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con ID: " + dto.getIdCita()));
+			existingServiCita.setIdCita(dto.getIdCita());
+			existingServiCita.setIdServicio(cita.getServicio().getId());
+		}
+
+		existingServiCita.setComentario(dto.getComentario());
+		existingServiCita.setValoracion(dto.getValoracion());
+
+		ServiCita updatedServiCita = serviCitaRepository.save(existingServiCita);
+
+		ServiCita completeServiCita = serviCitaRepository.findById(updatedServiCita.getId())
+				.orElseThrow(() -> new IllegalStateException("Error al cargar el ServiCita completo."));
+
+		return serviCitaEntityMapper.toDTO(completeServiCita);
+	}
+
+	public boolean delete(int id) {
+		if (serviCitaRepository.existsById(id)) {
+			serviCitaRepository.deleteById(id);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean existServiCita(int id) {
+		return serviCitaRepository.existsById(id);
+	}
+
+	public List<ServiCitaEntityDTO> findTopFiveValoraciones() {
+		return serviCitaRepository.findTop5ByOrderByValoracionDesc().stream().map(serviCitaEntityMapper::toDTO)
+				.collect(Collectors.toList());
+	}
 }

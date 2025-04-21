@@ -32,6 +32,12 @@ public class ServiCita {
     @Column(name = "id_cita", nullable = false)
     private int idCita;
 
+    @Column(length = 500)
+    private String comentario;
+
+    @Column(columnDefinition = "DECIMAL(2,1)")
+    private Double valoracion;
+
     @ManyToOne
     @JoinColumn(name = "id_cita", referencedColumnName = "id", insertable = false, updatable = false)
     private Cita cita;
@@ -40,4 +46,5 @@ public class ServiCita {
     @JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
     private Servicio servicio;
 }
+
 

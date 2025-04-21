@@ -35,9 +35,7 @@ public class VehiculoController {
 
 	@GetMapping
 	public ResponseEntity<List<VehiculoDTO>> list() {
-		List<VehiculoDTO> vehiculos = this.vehiculoService.findAll().stream().map(vehiculoMapper::toDTO)
-				.collect(Collectors.toList());
-		;
+		List<VehiculoDTO> vehiculos = this.vehiculoService.findAll().stream().map(vehiculoMapper::toDTO).collect(Collectors.toList());
 
 		return ResponseEntity.ok(vehiculos);
 	}
