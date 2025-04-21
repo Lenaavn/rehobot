@@ -94,6 +94,14 @@ public class UsuarioController {
 	    	return ResponseEntity.badRequest().body("El atributo 'rol' no puede estar nulo para actualizar el usuario.");
 	    }
 	    
+	    if (usuarioService.existsByEmail(usuario.getEmail())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo email.");
+	    }
+
+	    if (usuarioService.existsByTelefono(usuario.getTelefono())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo teléfono.");
+	    }
+	    
 	    if (!this.usuarioService.existsUsuario(idUsuario)) {
 	        return ResponseEntity.notFound().build();
 	    }
