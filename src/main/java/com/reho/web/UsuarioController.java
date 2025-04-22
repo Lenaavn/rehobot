@@ -19,7 +19,7 @@ import com.reho.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins="http://localhost:4200/") //si da error a la larga se borra
+@CrossOrigin(origins="http://localhost:4200/") 
 public class UsuarioController {
 
 	@Autowired
@@ -74,43 +74,45 @@ public class UsuarioController {
 	@PutMapping("/{idUsuario}")
 	// ResponseEntity<?> para permitir diferentes tipos de respuesta
 	public ResponseEntity<?> update(@PathVariable int idUsuario, @RequestBody Usuario usuario) {
-	    if (idUsuario != (usuario.getId())) {
+	    if (idUsuario != usuario.getId()) {
 	        return ResponseEntity.badRequest().body("El ID de la URL no coincide con el ID del cuerpo del usuario.");
 	    }
-	    
-	    if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
-	    	return ResponseEntity.badRequest().body("El atributo 'nombre' no puede estar vacío ni ser nulo para actualizar el usuario.");
-	    }
-	    
-	    if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-	    	return ResponseEntity.badRequest().body("El atributo 'email' no puede estar vacío ni ser nulo para actualizar el usuario.");
-	    }
-	    
-	    if (usuario.getContrasena() == null || usuario.getContrasena().trim().isEmpty()) {
-	    	return ResponseEntity.badRequest().body("El atributo 'contrasena' no puede estar vacío ni ser nulo para actualizar el usuario.");
-	    }
-	    
-	    if (usuario.getRol() == null) {
-	    	return ResponseEntity.badRequest().body("El atributo 'rol' no puede estar nulo para actualizar el usuario.");
-	    }
-	    
-	    if (usuarioService.existsByEmail(usuario.getEmail())) {
-	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo email.");
-	    }
 
-	    if (usuarioService.existsByTelefono(usuario.getTelefono())) {
-	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo teléfono.");
-	    }
-	    
-	    if (!this.usuarioService.existsUsuario(idUsuario)) {
+	    Usuario usuarioActual = usuarioService.findById(idUsuario).get();
+	    if (usuarioActual == null) {
 	        return ResponseEntity.notFound().build();
 	    }
 
-	    return ResponseEntity.ok(this.usuarioService.save(usuario));
+	    if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body("El atributo 'nombre' no puede estar vacío ni ser nulo para actualizar el usuario.");
+	    }
+
+	    if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body("El atributo 'email' no puede estar vacío ni ser nulo para actualizar el usuario.");
+	    }
+	    if (!usuario.getEmail().equals(usuarioActual.getEmail()) && usuarioService.existsByEmail(usuario.getEmail())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo email.");
+	    }
+
+	    if (usuario.getContrasena() == null || usuario.getContrasena().trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body("El atributo 'contrasena' no puede estar vacío ni ser nulo para actualizar el usuario.");
+	    }
+
+	    if (usuario.getRol() == null) {
+	        return ResponseEntity.badRequest().body("El atributo 'rol' no puede estar nulo para actualizar el usuario.");
+	    }
+
+	    if (usuario.getTelefono() == null || usuario.getTelefono().trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body("El atributo 'telefono' no puede estar vacío ni ser nulo para actualizar el usuario.");
+	    }
+	    if (!usuario.getTelefono().equals(usuarioActual.getTelefono()) && usuarioService.existsByTelefono(usuario.getTelefono())) {
+	        return ResponseEntity.badRequest().body("Ya existe un usuario con el mismo teléfono.");
+	    }
+
+	    return ResponseEntity.ok(usuarioService.save(usuario));
 	}
 
-
-
+	
 	@DeleteMapping("/{idUsuario}")
 	public ResponseEntity<Usuario> delete(@PathVariable int idUsuario) {
 		if (this.usuarioService.delete(idUsuario)) {
@@ -119,5 +121,6 @@ public class UsuarioController {
 
 		return ResponseEntity.notFound().build();
 	}
+
 
 }
