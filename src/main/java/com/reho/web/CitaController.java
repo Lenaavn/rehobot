@@ -136,4 +136,31 @@ public class CitaController {
 		}
 		return ResponseEntity.notFound().build();
 	}
+
+	@GetMapping("/pagadas")
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> getCitasPagadas() {
+		List<CitaDTO> citasPagadas = citaService.findCitasPagadas().stream().map(citaMapper::toDTO)
+				.collect(Collectors.toList());
+
+		if (citasPagadas.isEmpty()) {
+			return ResponseEntity.ok("No hay citas pagadas de momento.");
+		}
+
+		return ResponseEntity.ok(citasPagadas);
+	}
+
+	@GetMapping("/noPagadas")
+	// ResponseEntity<?> para permitir diferentes tipos de respuesta
+	public ResponseEntity<?> getCitasNoPagadas() {
+		List<CitaDTO> citasNoPagadas = citaService.findCitasNoPagadas().stream().map(citaMapper::toDTO)
+				.collect(Collectors.toList());
+
+		if (citasNoPagadas.isEmpty()) {
+			return ResponseEntity.ok("No hay citas no pagadas de momento.");
+		}
+
+		return ResponseEntity.ok(citasNoPagadas);
+	}
+
 }

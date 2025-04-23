@@ -1,5 +1,6 @@
 package com.reho.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,5 +84,13 @@ public class UsuarioService {
 	public boolean existsByTelefono(String telefono) {
 		return usuarioRepository.existsByTelefono(telefono);
 	}
+	
+	// Método para obtener los usuarios ordenados alfabeticamente
+	// Comparator.comparing -> sirve para simplificar la comparación de objetos.
+	public List<Usuario> findAllOrdenadosPorNombre() {
+        List<Usuario> usuarios = this.usuarioRepository.findAll();
+        usuarios.sort(Comparator.comparing(Usuario::getNombre));
+        return usuarios;
+    }
 
 }

@@ -2,6 +2,7 @@ package com.reho.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,5 +80,15 @@ public class CitaService {
 
 		return result;
 	}
+	
+	// Método para obtener citas pagadas
+    public List<Cita> findCitasPagadas() {
+        return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.PAGADA).collect(Collectors.toList());
+    }
+
+    // Método para obtener citas no pagadas
+    public List<Cita> findCitasNoPagadas() {
+        return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.NO_PAGADA).collect(Collectors.toList());
+    }
 
 }
