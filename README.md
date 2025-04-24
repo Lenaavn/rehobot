@@ -39,7 +39,7 @@ Para instalar y configurar el proyecto en tu máquina local, sigue estos pasos:
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tuusuario/rehobot.git
+   git clone https://github.com/Lenaavn/rehobot.git
    
 2. Accede al directorio del proyecto:
    ```bash
