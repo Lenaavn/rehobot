@@ -10,8 +10,13 @@ INSERT INTO vehiculo (id_usuario, marca, modelo, matricula) VALUES
 
 -- Inserción en la tabla servicio
 INSERT INTO servicio (nombre, descripcion, precio) VALUES
-('Lavado_1', 'Incluye lavado exterior e interior.', 15.00),
-('Lavado_3', 'Incluye lavado completo y encerado.', 30.00);
+('LAVADO_ASPIRADO_COCHE_PEQUENO', 'Lavado y aspirado para coche pequeño (Duración: 1h)', 30.00),
+('LAVADO_ASPIRADO_CAMIONETA', 'Lavado y aspirado para camioneta (Duración: 1h 15min)', 40.00),
+('LAVADO_TAPICERIA_COCHE_PEQUENO', 'Lavado de tapicería para coche pequeño (Duración: 3h 30min)', 100.00),
+('PULIDO_FAROS', 'Pulido de faros para mejorar la visibilidad (Duración: 2h)', 50.00),
+('DETALLADO_COMPLETO', 'Detallado interior, exterior, ruedas y motor (Duración: 3h 30min)', 130.00),
+('TRATAMIENTO_CERAMICO', 'Tratamiento cerámico + detallado completo + motor (Duración: 5h 30min)', 260.00);
+
 
 -- Inserción en la tabla cita
 -- Primero las citas, id_pago puede ser 0 como valor temporal

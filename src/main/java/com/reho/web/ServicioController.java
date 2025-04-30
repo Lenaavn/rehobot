@@ -12,6 +12,7 @@ import com.reho.service.ServicioService;
 
 @RestController
 @RequestMapping("/servicios")
+@CrossOrigin(origins = "http://localhost:4200/")
 public class ServicioController {
 
 	@Autowired
@@ -71,8 +72,8 @@ public class ServicioController {
 			return ResponseEntity.badRequest().body("El campo 'nombre' no puede ser nulo.");
 		}
 
-		if (servicio.getPrecio() == null) {
-			return ResponseEntity.badRequest().body("El campo 'precio' no puede ser nulo.");
+		if (servicio.getPrecio() == null || servicio.getPrecio() <= 0) {
+			return ResponseEntity.badRequest().body("El campo 'precio' no puede ser nulo y debe ser mayor a 0.");
 		}
 
 		if (!this.servicioService.existServicio(idServicio)) {
