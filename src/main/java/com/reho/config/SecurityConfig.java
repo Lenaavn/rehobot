@@ -28,7 +28,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
 		httpSecurity.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers(publicEnpoints()).permitAll().anyRequest().authenticated())
+				.authorizeHttpRequests(auth -> auth.requestMatchers(publicEnpoints()).permitAll())
+				.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -38,7 +39,7 @@ public class SecurityConfig {
 
 	// metodos publicos que acceden todos sin iniciar sesión
 	private RequestMatcher publicEnpoints() {
-		return new OrRequestMatcher(new AntPathRequestMatcher("/auth/**"));
+		return new OrRequestMatcher(new AntPathRequestMatcher("/**"));
 	}
 
 }
