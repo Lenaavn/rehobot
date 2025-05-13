@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.reho.persistence.entities.Usuario;
@@ -16,6 +17,8 @@ public class UsuarioService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+
+	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	public List<Usuario> findAll() {
 		return this.usuarioRepository.findAll();
@@ -75,6 +78,11 @@ public class UsuarioService {
 	public boolean existsUsuario(Integer idUsuario) {
 		return usuarioRepository.existsById(idUsuario);
 	}
+	
+	public boolean existsUsuarioEmail(String email) {
+	    return usuarioRepository.findByEmail(email).isPresent();
+	}
+
 
 	public boolean existsByEmail(String email) {
 		return usuarioRepository.existsByEmail(email);
@@ -84,13 +92,27 @@ public class UsuarioService {
 	public boolean existsByTelefono(String telefono) {
 		return usuarioRepository.existsByTelefono(telefono);
 	}
-	
+
+	public boolean actualizarContrasena(String email, String nuevaContrasena) {
+		Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
+		if (usuarioOpt.isPresent()) {
+			Usuario usuario = usuarioOpt.get();
+			usuario.setContrasena(passwordEncoder.encode(nuevaContrasena)); // Codificar la nueva contraseña
+			usuarioRepository.save(usuario);
+
+			return true;
+		}
+
+		return false;
+	}
+
 	// Método para obtener los usuarios ordenados alfabeticamente
 	// Comparator.comparing -> sirve para simplificar la comparación de objetos.
 	public List<Usuario> findAllOrdenadosPorNombre() {
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        usuarios.sort(Comparator.comparing(Usuario::getNombre));
-        return usuarios;
-    }
+		List<Usuario> usuarios = this.usuarioRepository.findAll();
+		usuarios.sort(Comparator.comparing(Usuario::getNombre));
+		return usuarios;
+	}
 
 }

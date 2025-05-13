@@ -46,7 +46,11 @@ public class SecurityConfig {
 
     // Métodos públicos que acceden todos sin iniciar sesión
     private RequestMatcher publicEnpoints() {
-        return new OrRequestMatcher(new AntPathRequestMatcher("/auth/**"));
+        return new OrRequestMatcher(
+        		//new AntPathRequestMatcher("/**"),
+        		new AntPathRequestMatcher("/auth/**"),
+        		new AntPathRequestMatcher("/usuarios/actuContrasena")
+        		);
     }
 
     @Bean

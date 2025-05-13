@@ -9,6 +9,7 @@ import com.reho.persistence.entities.Usuario;
 public interface UsuarioRepository extends JpaRepository<Usuario,Integer>{
 	
 	Optional<Usuario> findByEmail(String email);
+	Optional<Usuario> findByTelefono(String telefono);
 
 	boolean existsById(Integer id);
 	boolean existsByEmail(String email);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.reho.persistence.entities.Usuario;
@@ -128,10 +129,26 @@ public class UsuarioController {
 
 		return ResponseEntity.notFound().build();
 	}
-	
+
+	@PutMapping("/actuContrasena")
+	public ResponseEntity<String> actualizarContrasena(@RequestParam String email,
+			@RequestParam String nuevaContrasena) {
+		if (!usuarioService.existsUsuarioEmail(email)) {
+			return ResponseEntity.badRequest().body("No hay un usuario registrado con ese email.");
+		}
+
+		boolean actualizada = usuarioService.actualizarContrasena(email, nuevaContrasena);
+
+		if (actualizada) {
+			return ResponseEntity.ok("Contraseña actualizada correctamente.");
+		} else {
+			return ResponseEntity.badRequest().body("Hubo un problema al actualizar la contraseña.");
+		}
+	}
+
 	@GetMapping("/ordenados")
-    public ResponseEntity<List<Usuario>> listOrdenados() {
-        return ResponseEntity.ok(this.usuarioService.findAllOrdenadosPorNombre());
-    }
+	public ResponseEntity<List<Usuario>> listOrdenados() {
+		return ResponseEntity.ok(this.usuarioService.findAllOrdenadosPorNombre());
+	}
 
 }
