@@ -34,27 +34,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
-
 			return;
 		}
 
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.getUserName(jwt);
 
-		if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+		// validación simple del token antes de procesarlo
+		if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-			if (jwtService.validateToken(jwt, userDetails)) {
-				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
+		UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-			}
+		if (jwtService.validateToken(jwt, userDetails)) {
+			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+					userDetails, null, userDetails.getAuthorities());
+
+			authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		}
 
 		filterChain.doFilter(request, response);
-
 	}
-
 }
