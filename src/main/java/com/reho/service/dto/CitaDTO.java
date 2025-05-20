@@ -24,10 +24,10 @@ public class CitaDTO {
 	private String nombreUsuario;
 	private int idPago;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+	@JsonFormat( pattern = "yyyy-MM-dd")
 	private LocalDate fecha;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+	@JsonFormat( pattern = "HH:mm")
 	private LocalTime hora;
 	
 	private Estado estado;
