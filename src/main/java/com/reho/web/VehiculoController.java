@@ -150,5 +150,11 @@ public class VehiculoController {
 
 		return ResponseEntity.notFound().build();
 	}
+	
+	// Obtener vehículos de un usuario específico
+    @GetMapping("/usuario/{idUsuario}")
+    public List<Vehiculo> obtenerVehiculosPorUsuario(@PathVariable int idUsuario) {
+        return vehiculoService.obtenerVehiculosPorUsuario(idUsuario);
+    }
 
 }

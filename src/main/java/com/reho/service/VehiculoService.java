@@ -138,5 +138,10 @@ public class VehiculoService {
 
 		return null;
 	}
+	
+	// Obtener los vehículos de un usuario específico
+    public List<Vehiculo> obtenerVehiculosPorUsuario(int idUsuario) {
+        return vehiculoRepository.findByIdUsuario(idUsuario);
+    }
 
 }
