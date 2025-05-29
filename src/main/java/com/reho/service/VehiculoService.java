@@ -123,21 +123,22 @@ public class VehiculoService {
 	 */
 
 	public String validateMatricula(String matricula) {
-		if (matricula == null || matricula.isEmpty()) {
-			return null;
-		}
-		
-		matricula = matricula.toUpperCase();
+	    if (matricula == null || matricula.isEmpty()) {
+	        throw new IllegalArgumentException("La matrícula no puede estar vacía.");
+	    }
+	    
+	    matricula = matricula.toUpperCase();
 
-		String patternActual = "^[0-9]{4}[A-Z]{3}$";
-		String patternAntigua = "^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,2}$";
+	    String patternActual = "^[0-9]{4}[A-Z]{3}$"; // Ejemplo: 1234ABC
+	    String patternAntigua = "^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,2}$"; // Ejemplo: A123BC
 
-		if (matricula.matches(patternActual) || matricula.matches(patternAntigua)) {
-			return matricula;
-		}
+	    if (matricula.matches(patternActual) || matricula.matches(patternAntigua)) {
+	        return matricula;
+	    }
 
-		return null;
+	    throw new IllegalArgumentException("La matrícula '" + matricula + "' no tiene un formato válido.");
 	}
+
 	
 	// Obtener los vehículos de un usuario específico
     public List<Vehiculo> obtenerVehiculosPorUsuario(int idUsuario) {

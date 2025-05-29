@@ -60,6 +60,13 @@ public class VehiculoController {
 	    if (!usuarioService.existsUsuario(vehiculoDTO.getIdUsuario())) {
 	        return ResponseEntity.badRequest().body("El usuario especificado no existe.");
 	    }
+	    
+	    // Validar que la matrícula sea válida
+	    try {
+	        vehiculoDTO.setMatricula(vehiculoService.validateMatricula(vehiculoDTO.getMatricula()));
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage()); // Enviar mensaje de error si la matrícula es inválida
+	    }
 
 	    // Convertir la matrícula a mayúsculas
 	    vehiculoDTO.setMatricula(vehiculoDTO.getMatricula().toUpperCase());

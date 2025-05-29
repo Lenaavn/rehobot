@@ -29,11 +29,11 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
 	    if (authServiceImpl.existeUsuarioPorEmail(request.getEmail())) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto, ya existe."));
+	        return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto."));
 	    }
 
 	    if (authServiceImpl.existeUsuarioPorTelefono(request.getTelefono())) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El teléfono es incorrecto, ya existe."));
+	        return ResponseEntity.badRequest().body(new AuthResponse("El teléfono es incorrecto."));
 	    }
 
 	    authService.register(request);

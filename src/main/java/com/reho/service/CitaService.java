@@ -1,5 +1,7 @@
 package com.reho.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,15 +82,32 @@ public class CitaService {
 
 		return result;
 	}
-	
-	// Método para obtener citas pagadas
-    public List<Cita> findCitasPagadas() {
-        return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.PAGADA).collect(Collectors.toList());
-    }
 
-    // Método para obtener citas no pagadas
-    public List<Cita> findCitasNoPagadas() {
-        return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.NO_PAGADA).collect(Collectors.toList());
+	// Método para obtener citas pagadas
+	public List<Cita> findCitasPagadas() {
+		return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.PAGADA)
+				.collect(Collectors.toList());
+	}
+
+	// Método para obtener citas no pagadas
+	public List<Cita> findCitasNoPagadas() {
+		return citaRepository.findAll().stream().filter(cita -> cita.getEstado() == Estado.NO_PAGADA)
+				.collect(Collectors.toList());
+	}
+
+	// Método para obtener citas por id del usuaio a traves de vehiculo
+	public List<Cita> findCitasPorUsuario(int idUsuario) {
+		return citaRepository.findByVehiculo_IdUsuario(idUsuario);
+	}
+
+	public List<LocalTime> getHorasOcupadas(int idServicio, LocalDate fecha) {
+		return citaRepository.findByServicio_IdAndFecha(idServicio, fecha).stream().map(Cita::getHora)
+				.collect(Collectors.toList());
+	}
+	
+	public List<Cita> obtenerCitasDeHoy() {
+        LocalDate hoy = LocalDate.now();
+        return citaRepository.findByFecha(hoy);
     }
 
 }

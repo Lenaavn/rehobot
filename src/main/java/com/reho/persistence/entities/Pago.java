@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.reho.persistence.entities.enums.MetodoPago;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +41,7 @@ public class Pago {
 	@Column(name = "metodo_pago", length = 20, nullable = false)
 	private MetodoPago metodoPago;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "id_cita", referencedColumnName = "id", nullable = false)
 	@JsonIgnore
 	private Cita cita;

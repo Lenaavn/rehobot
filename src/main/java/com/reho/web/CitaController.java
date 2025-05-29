@@ -1,9 +1,13 @@
 package com.reho.web;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -162,5 +166,36 @@ public class CitaController {
 
 		return ResponseEntity.ok(citasNoPagadas);
 	}
+
+	@GetMapping("/usuario/{idUsuario}")
+	public ResponseEntity<List<CitaDTO>> getCitasPorUsuario(@PathVariable int idUsuario) {
+		List<CitaDTO> citasUsuario = citaService.findCitasPorUsuario(idUsuario).stream().map(citaMapper::toDTO)
+				.collect(Collectors.toList());
+
+		if (citasUsuario.isEmpty()) {
+			return ResponseEntity.ok(new ArrayList<>());
+		}
+
+		return ResponseEntity.ok(citasUsuario);
+	}
+
+	@GetMapping("/ocupadas/{idServicio}/{fecha}")
+	public ResponseEntity<List<String>> getHorasOcupadas(@PathVariable int idServicio,
+	                                                     @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+	    if (!servicioService.existServicio(idServicio)) {
+	        return ResponseEntity.badRequest().body(null);
+	    }
+
+	    List<String> horasOcupadas = citaService.getHorasOcupadas(idServicio, fecha).stream()
+	                                            .map(hora -> hora.format(DateTimeFormatter.ofPattern("HH:mm")))
+	                                            .collect(Collectors.toList());
+
+	    return ResponseEntity.ok(horasOcupadas);
+	}
+	
+	@GetMapping("/hoy")
+    public List<Cita> obtenerCitasDeHoy() {
+        return citaService.obtenerCitasDeHoy();
+    }
 
 }
