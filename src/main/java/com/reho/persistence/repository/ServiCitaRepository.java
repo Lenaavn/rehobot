@@ -9,5 +9,6 @@ import com.reho.persistence.entities.ServiCita;
 public interface ServiCitaRepository extends JpaRepository<ServiCita,Integer>{
 
 	List<ServiCita> findTop5ByOrderByValoracionDesc();
+	List<ServiCita> findByCitaVehiculoIdUsuario(int idUsuario);
 	
 }

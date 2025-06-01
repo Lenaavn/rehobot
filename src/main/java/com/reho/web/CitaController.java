@@ -194,8 +194,8 @@ public class CitaController {
 	}
 	
 	@GetMapping("/hoy")
-    public List<Cita> obtenerCitasDeHoy() {
-        return citaService.obtenerCitasDeHoy();
+    public ResponseEntity<List<Cita>> obtenerCitasDeHoy() {
+        return ResponseEntity.ok(citaService.obtenerCitasDeHoy());
     }
 
 }

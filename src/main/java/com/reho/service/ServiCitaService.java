@@ -91,4 +91,11 @@ public class ServiCitaService {
 		return serviCitaRepository.findTop5ByOrderByValoracionDesc().stream().map(serviCitaEntityMapper::toDTO)
 				.collect(Collectors.toList());
 	}
+	
+	// Obtener los valoraciones de un usuario específico
+    public List<ServiCitaEntityDTO> obtenerPagosPorUsuario(int idUsuario) {
+        return serviCitaRepository.findByCitaVehiculoIdUsuario(idUsuario).stream().map(serviCitaEntityMapper::toDTO)
+				.collect(Collectors.toList());
+    }
+	
 }

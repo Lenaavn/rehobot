@@ -96,5 +96,9 @@ public class PagoService {
 	    return this.pagoRepository.save(pago);
 	}
 
+	// Obtener los pagos de un usuario específico
+    public List<Pago> obtenerPagosPorUsuario(int idUsuario) {
+        return pagoRepository.findByCitaVehiculoUsuarioId(idUsuario);
+    }
 
 }

@@ -160,8 +160,8 @@ public class VehiculoController {
 	
 	// Obtener vehículos de un usuario específico
     @GetMapping("/usuario/{idUsuario}")
-    public List<Vehiculo> obtenerVehiculosPorUsuario(@PathVariable int idUsuario) {
-        return vehiculoService.obtenerVehiculosPorUsuario(idUsuario);
+    public ResponseEntity<List<Vehiculo>> obtenerVehiculosPorUsuario(@PathVariable int idUsuario) {
+        return ResponseEntity.ok(vehiculoService.obtenerVehiculosPorUsuario(idUsuario));
     }
 
 }

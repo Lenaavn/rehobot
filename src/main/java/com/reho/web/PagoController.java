@@ -90,5 +90,11 @@ public class PagoController {
 
 		return ResponseEntity.ok(pagoActualizado);
 	}
+	
+	// Obtener pagos de un usuario específico
+    @GetMapping("/usuario/{idUsuario}/pays")
+    public ResponseEntity<List<Pago>> obtenerPagosPorUsuario(@PathVariable int idUsuario) {
+        return ResponseEntity.ok(pagoService.obtenerPagosPorUsuario(idUsuario));
+    }
 
 }

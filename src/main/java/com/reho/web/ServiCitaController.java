@@ -147,6 +147,13 @@ public class ServiCitaController {
     public ResponseEntity<List<ServiCitaEntityDTO>> getTopFiveValoraciones() {
         return ResponseEntity.ok(this.serviCitaService.findTopFiveValoraciones());
     }
+    
+    // Obtener valoraciones de un usuario específico
+    @GetMapping("/usuario/{idUsuario}/valoracion")
+    public ResponseEntity<List<ServiCitaEntityDTO>> obtenerPagosPorUsuario(@PathVariable int idUsuario) {
+        return ResponseEntity.ok(serviCitaService.obtenerPagosPorUsuario(idUsuario));
+    }
+    
 }
 
 
