@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.reho.config.JwtService;
+import com.reho.persistence.repository.UsuarioRepository;
 import com.reho.service.authentication.AuthService;
 import com.reho.service.authentication.AuthServiceImpl;
 import com.reho.web.models.AuthResponse;
@@ -25,6 +27,12 @@ public class AuthController {
 
 	@Autowired
 	private AuthServiceImpl authServiceImpl;
+	
+	@Autowired
+	private JwtService jwtService;
+	
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
 	@PostMapping("/register")
 	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
@@ -44,26 +52,37 @@ public class AuthController {
 
 	@PostMapping("/authenticate")
 	public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthenticationRequest request) {
-		if (request.getEmail() == null || request.getEmail().isEmpty()) {
-			return ResponseEntity.badRequest().body(new AuthResponse("El email es obligatorio."));
-		}
+	    if (request.getEmail() == null || request.getEmail().isEmpty()) {
+	        return ResponseEntity.badRequest().body(new AuthResponse("El email es obligatorio."));
+	    }
 
-		if (request.getContrasena() == null || request.getContrasena().isEmpty()) {
-			return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es obligatoria."));
-		}
+	    if (request.getContrasena() == null || request.getContrasena().isEmpty()) {
+	        return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es obligatoria."));
+	    }
 
-		boolean existeUsuario = authServiceImpl.existeUsuarioPorEmail(request.getEmail());
-		if (!existeUsuario) {
-			return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto."));
-		}
+	    boolean existeUsuario = authServiceImpl.existeUsuarioPorEmail(request.getEmail());
+	    if (!existeUsuario) {
+	        return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto."));
+	    }
 
-		boolean contrasenaCorrecta = authServiceImpl.verificarContrasena(request.getEmail(), request.getContrasena());
-		if (!contrasenaCorrecta) {
-			return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es incorrecta."));
-		}
+	    boolean contrasenaCorrecta = authServiceImpl.verificarContrasena(request.getEmail(), request.getContrasena());
+	    if (!contrasenaCorrecta) {
+	        return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es incorrecta."));
+	    }
 
-		AuthResponse response = authService.authenticate(request);
-		return ResponseEntity.ok(response);
+	    var usuario = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
+
+	    // Si el token está expirado, GENERAR UN NUEVO TOKEN
+	    if (request.getToken() == null || jwtService.isTokenExpired(request.getToken())) {
+	        String nuevoToken = jwtService.generateToken(usuario);
+	        return ResponseEntity.ok(new AuthResponse(nuevoToken));
+	    }
+
+	    // Si el token aún es válido pero está cerca de expirar, renovarlo
+	    String nuevoToken = jwtService.renovarTokenSiEsNecesario(request.getToken(), usuario);
+	    return ResponseEntity.ok(new AuthResponse(nuevoToken));
 	}
+
+
 
 }
