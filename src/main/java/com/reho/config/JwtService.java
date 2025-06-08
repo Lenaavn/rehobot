@@ -41,12 +41,12 @@ public class JwtService {
 		return buildToken(extraClaims, userDetails.getUsername(), 1000 * 60 * 60 * 24); // 24 horas
 	}
 
-	// 🔁 GENERAR REFRESH TOKEN (sin claims adicionales y más duración)
+	// GENERAR REFRESH TOKEN 
 	public String generateRefreshToken(UserDetails userDetails) {
 		return buildToken(new HashMap<>(), userDetails.getUsername(), 1000 * 60 * 60 * 24 * 7); // 7 días
 	}
 
-	// 🔧 Método privado común para crear tokens
+	// Método privado común para crear tokens
 	private String buildToken(Map<String, Object> claims, String subject, long expirationMs) {
 		return Jwts.builder()
 				.setClaims(claims)
