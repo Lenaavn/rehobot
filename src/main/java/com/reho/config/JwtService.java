@@ -27,8 +27,8 @@ public class JwtService {
 	private static final String SECRET_KEY = "k/XQCmS3xR5VJd23DjTtthpbDuL0mZ2mL6WUxhjkYOA=";
 	private final UsuarioRepository usuarioRepository;
 
-	// Generar un nuevo token con datos completos
-	public String generateToken(UserDetails userDetails) {
+	// GENERAR ACCESS TOKEN 
+	public String generateAccessToken(UserDetails userDetails) {
 		Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername())
 				.orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -38,14 +38,23 @@ public class JwtService {
 		extraClaims.put("email", usuario.getEmail());
 		extraClaims.put("rol", usuario.getRol());
 
-		return generateToken(extraClaims, userDetails);
+		return buildToken(extraClaims, userDetails.getUsername(), 1000 * 60 * 60 * 24); // 24 horas
 	}
 
-	public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-		return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
+	// 🔁 GENERAR REFRESH TOKEN (sin claims adicionales y más duración)
+	public String generateRefreshToken(UserDetails userDetails) {
+		return buildToken(new HashMap<>(), userDetails.getUsername(), 1000 * 60 * 60 * 24 * 7); // 7 días
+	}
+
+	// 🔧 Método privado común para crear tokens
+	private String buildToken(Map<String, Object> claims, String subject, long expirationMs) {
+		return Jwts.builder()
+				.setClaims(claims)
+				.setSubject(subject)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Expira en 24 horas
-				.signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
+				.setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+				.signWith(getSignInKey(), SignatureAlgorithm.HS256)
+				.compact();
 	}
 
 	public String getUserName(String token) {
@@ -58,29 +67,17 @@ public class JwtService {
 	}
 
 	private Claims getAllClaims(String token) {
-		return Jwts.parserBuilder().setSigningKey(getSignInKey()).setAllowedClockSkewSeconds(60) // Permite hasta 60 segundos de diferencia horaria
-				.build().parseClaimsJws(token).getBody();
+		return Jwts.parserBuilder()
+				.setSigningKey(getSignInKey())
+				.setAllowedClockSkewSeconds(60)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
 	}
 
 	private SecretKey getSignInKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 		return Keys.hmacShaKeyFor(keyBytes);
-	}
-
-	// Método para verificar si el token está por expirar
-	public boolean isTokenExpiringSoon(String token) {
-		Date expiration = getExpiration(token);
-		long tiempoRestante = expiration.getTime() - System.currentTimeMillis();
-
-		return tiempoRestante < (1000 * 60 * 60); // Se considera "pronto" si queda menos de 1 hora
-	}
-
-	// Método para renovar el token automáticamente si está por expirar
-	public String renovarTokenSiEsNecesario(String token, UserDetails userDetails) {
-		if (isTokenExpiringSoon(token)) {
-			return generateToken(userDetails); // Genera un nuevo token si está por expirar
-		}
-		return token;
 	}
 
 	public boolean validateToken(String token, UserDetails userDetails) {

@@ -37,52 +37,87 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
 	    if (authServiceImpl.existeUsuarioPorEmail(request.getEmail())) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto."));
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("El email ya está en uso.")
+				.build());
 	    }
 
 	    if (authServiceImpl.existeUsuarioPorTelefono(request.getTelefono())) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El teléfono es incorrecto."));
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("El teléfono ya está en uso.")
+				.build());
 	    }
 
 	    authService.register(request);
-	    return ResponseEntity.ok().build();
+
+	    var usuario = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
+	    String accessToken = jwtService.generateAccessToken(usuario);
+	    String refreshToken = jwtService.generateRefreshToken(usuario);
+
+	    return ResponseEntity.ok(AuthResponse.builder()
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build());
 	}
-
-
 
 	@PostMapping("/authenticate")
 	public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthenticationRequest request) {
 	    if (request.getEmail() == null || request.getEmail().isEmpty()) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El email es obligatorio."));
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("El email es obligatorio.")
+				.build());
 	    }
 
 	    if (request.getContrasena() == null || request.getContrasena().isEmpty()) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es obligatoria."));
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("La contraseña es obligatoria.")
+				.build());
 	    }
 
-	    boolean existeUsuario = authServiceImpl.existeUsuarioPorEmail(request.getEmail());
-	    if (!existeUsuario) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("El email es incorrecto."));
+	    if (!authServiceImpl.existeUsuarioPorEmail(request.getEmail())) {
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("El email es incorrecto.")
+				.build());
 	    }
 
-	    boolean contrasenaCorrecta = authServiceImpl.verificarContrasena(request.getEmail(), request.getContrasena());
-	    if (!contrasenaCorrecta) {
-	        return ResponseEntity.badRequest().body(new AuthResponse("La contraseña es incorrecta."));
+	    if (!authServiceImpl.verificarContrasena(request.getEmail(), request.getContrasena())) {
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("La contraseña es incorrecta.")
+				.build());
 	    }
 
 	    var usuario = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
+	    String accessToken = jwtService.generateAccessToken(usuario);
+	    String refreshToken = jwtService.generateRefreshToken(usuario);
 
-	    // Si el token está expirado, GENERAR UN NUEVO TOKEN
-	    if (request.getToken() == null || jwtService.isTokenExpired(request.getToken())) {
-	        String nuevoToken = jwtService.generateToken(usuario);
-	        return ResponseEntity.ok(new AuthResponse(nuevoToken));
-	    }
-
-	    // Si el token aún es válido pero está cerca de expirar, renovarlo
-	    String nuevoToken = jwtService.renovarTokenSiEsNecesario(request.getToken(), usuario);
-	    return ResponseEntity.ok(new AuthResponse(nuevoToken));
+	    return ResponseEntity.ok(AuthResponse.builder()
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build());
 	}
 
+	@PostMapping("/refresh")
+	public ResponseEntity<AuthResponse> refresh(@RequestBody AuthenticationRequest request) {
+	    if (request.getToken() == null || request.getToken().isEmpty()) {
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("El refresh token es obligatorio.")
+				.build());
+	    }
 
+	    String email = jwtService.getUserName(request.getToken());
+	    var usuario = usuarioRepository.findByEmail(email).orElseThrow();
 
+	    if (!jwtService.validateToken(request.getToken(), usuario)) {
+	        return ResponseEntity.badRequest().body(AuthResponse.builder()
+				.mensaje("Refresh token inválido o expirado.")
+				.build());
+	    }
+
+	    String nuevoAccessToken = jwtService.generateAccessToken(usuario);
+
+	    return ResponseEntity.ok(AuthResponse.builder()
+			.accessToken(nuevoAccessToken)
+			.refreshToken(request.getToken()) // Reutilizamos el refresh token existente
+			.build());
+	}
 }
