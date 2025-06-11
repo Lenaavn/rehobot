@@ -93,31 +93,35 @@ public class AuthController {
 	    return ResponseEntity.ok(AuthResponse.builder()
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
+			.mensaje("Inicio sesion correctamente.")
 			.build());
 	}
 
 	@PostMapping("/refresh")
 	public ResponseEntity<AuthResponse> refresh(@RequestBody AuthenticationRequest request) {
-	    if (request.getToken() == null || request.getToken().isEmpty()) {
+	    if (request.getRefreshToken() == null || request.getRefreshToken().isEmpty()) {
 	        return ResponseEntity.badRequest().body(AuthResponse.builder()
-				.mensaje("El refresh token es obligatorio.")
-				.build());
+	            .mensaje("El refresh token es obligatorio.")
+	            .build());
 	    }
 
-	    String email = jwtService.getUserName(request.getToken());
+	    String email = jwtService.getUserName(request.getRefreshToken());
 	    var usuario = usuarioRepository.findByEmail(email).orElseThrow();
 
-	    if (!jwtService.validateToken(request.getToken(), usuario)) {
+	    if (!jwtService.validateRefreshToken(request.getRefreshToken())) {
 	        return ResponseEntity.badRequest().body(AuthResponse.builder()
-				.mensaje("Refresh token inválido o expirado.")
-				.build());
+	            .mensaje("Refresh token inválido o expirado.")
+	            .build());
 	    }
 
+	    // Generar un nuevo access token
 	    String nuevoAccessToken = jwtService.generateAccessToken(usuario);
 
 	    return ResponseEntity.ok(AuthResponse.builder()
-			.accessToken(nuevoAccessToken)
-			.refreshToken(request.getToken()) // Reutilizamos el refresh token existente
-			.build());
+	        .accessToken(nuevoAccessToken)
+	        .refreshToken(request.getRefreshToken()) // Reutilizamos el refresh token existente
+	        .build());
 	}
+
+
 }

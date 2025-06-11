@@ -13,6 +13,6 @@ public class AuthenticationRequest {
 	
 	private String email;
 	private String contrasena;
-	private String token;
+	private String refreshToken;
 
 }

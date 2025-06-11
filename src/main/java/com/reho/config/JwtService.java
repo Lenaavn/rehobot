@@ -38,12 +38,12 @@ public class JwtService {
 		extraClaims.put("email", usuario.getEmail());
 		extraClaims.put("rol", usuario.getRol());
 
-		return buildToken(extraClaims, userDetails.getUsername(), 1000 * 60 * 60 * 24); // 24 horas
+		return buildToken(extraClaims, userDetails.getUsername(), 1000 * 60 * 60 * 24 * 7); // 7 días
 	}
 
 	// GENERAR REFRESH TOKEN 
 	public String generateRefreshToken(UserDetails userDetails) {
-		return buildToken(new HashMap<>(), userDetails.getUsername(), 1000 * 60 * 60 * 24 * 7); // 7 días
+		return buildToken(new HashMap<>(), userDetails.getUsername(), 1000 * 60 * 60 * 24 * 60); // 60 días
 	}
 
 	// Método privado común para crear tokens
@@ -56,6 +56,16 @@ public class JwtService {
 				.signWith(getSignInKey(), SignatureAlgorithm.HS256)
 				.compact();
 	}
+	
+	// Validar el Refresh Token
+	public boolean validateRefreshToken(String token) {
+	    try {
+	        return !isTokenExpired(token); // Solo comprobar que no ha expirado
+	    } catch (Exception e) {
+	        return false;
+	    }
+	}
+
 
 	public String getUserName(String token) {
 		return getClaim(token, Claims::getSubject);
